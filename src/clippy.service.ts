@@ -34,7 +34,7 @@ export class ClippyService {
         // add the text node to the newly created div
         div.appendChild(newContent);
         div.innerHTML= `
-        <iframe src="https://todo.weijia.asia/vue-index.html" width="640px" height="400px" frameborder="0" scrolling="no">
+        <iframe src="http://cn.vuejs.org/guide/quick-start.html#using-vue-from-cdn" width="640px" height="400px" frameborder="0" scrolling="no">
         </iframe>
         `
 
