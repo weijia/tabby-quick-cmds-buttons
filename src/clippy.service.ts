@@ -28,12 +28,37 @@ export class ClippyService {
         link.rel = 'stylesheet'
         link.href = `${CDN}/assets/clippy.css`
         document.querySelector('head').appendChild(link)
+
+        const vueScript = document.createElement('script')
+        vueScript.src = 'https://unpkg.com/vue@3/dist/vue.global.js'
+        document.querySelector('head').appendChild(vueScript)
+
         const div = document.createElement('div')
         div.setAttribute("style", 'position:absolute;top:300px;left:300px;z-index:99999')
-        const newContent = document.createTextNode("Hi there and greetings!");
+        //const newContent = document.createTextNode("Hi there and greetings!");
         // add the text node to the newly created div
-        div.appendChild(newContent);
+        //div.appendChild(newContent);
+
+        div.innerHTML= `
+
+<div id="app">{{ message }}</div>
+
+<script>
+  const { createApp } = Vue
+  
+  createApp({
+    data() {
+      return {
+        message: 'Hello Vue!'
+      }
+    }
+  }).mount('#app')
+</script>
+        `
+
         document.querySelector('body').appendChild(div)
+
+
         setInterval(() => {
             this.agent?.animate()
         }, 10000)
