@@ -3,7 +3,7 @@ import { distinctUntilChanged, map } from 'rxjs'
 import { Injectable } from '@angular/core'
 import { Logger, LogService, ConfigService, HotkeysService } from 'tabby-core'
 
-const CDN = 'https://rawcdn.githack.com/pi0/clippyjs/d88943d529410114c9cea7f01e05de40254cd914'
+const CDN = 'https://gitee.com/weijia432/clippyjs/raw/master/'
 
 @Injectable({ providedIn: 'root'})
 export class ClippyService {
@@ -28,6 +28,12 @@ export class ClippyService {
         link.rel = 'stylesheet'
         link.href = `${CDN}/assets/clippy.css`
         document.querySelector('head').appendChild(link)
+        const div = document.createElement('div')
+        div.setAttribute("style", 'position:absolute;top:300px;left:300px;z-index:99999')
+        const newContent = document.createTextNode("Hi there and greetings!");
+        // add the text node to the newly created div
+        div.appendChild(newContent);
+        document.querySelector('body').appendChild(div)
         setInterval(() => {
             this.agent?.animate()
         }, 10000)
