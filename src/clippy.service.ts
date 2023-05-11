@@ -30,7 +30,7 @@ export class ClippyService {
         document.querySelector('head').appendChild(link)
 
         const vueScript = document.createElement('script')
-        vueScript.src = 'https://unpkg.com/vue@3/dist/vue.global.js'
+        vueScript.src = 'https://cdn.staticfile.org/vue/3.0.5/vue.global.js'
         document.querySelector('head').appendChild(vueScript)
 
         const div = document.createElement('div')

@@ -3,6 +3,13 @@ import { bufferTime } from 'rxjs'
 import { TerminalDecorator, BaseTerminalTabComponent, BaseSession } from 'tabby-terminal'
 import { ClippyService } from './clippy.service'
 
+
+declare global {
+    interface Window {
+        Vue:any;
+    }
+}
+
 @Injectable()
 export class ClippyDecorator extends TerminalDecorator {
     private tab: BaseTerminalTabComponent
@@ -31,7 +38,13 @@ export class ClippyDecorator extends TerminalDecorator {
     }
 
     private attachToSession (session: BaseSession) {
-
+        window.Vue.createApp({
+            data() {
+              return {
+                message: 'Hello Vue!'
+              }
+            }
+        }).mount('#app')
         session.output$.subscribe(data => {
             for (var element of this.clippy.config.store.qc.cmds) {
                 if (element.group === 'auto') {
