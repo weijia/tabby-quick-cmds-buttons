@@ -61,16 +61,17 @@ export class ClippyService {
             }
             window.Vue.createApp({
                 data() {
-                  let cmds = []
-                  for (let element of thisVar.config.store.qc.cmds) {
-                    // console.log(element)
-                    if (element.group === 'cmds') {
-                        cmds.push(element)
-                    }
-                  }
-                //   console.log("---------------------------------", cmds)
+                  let vueThis = this
+                  //   console.log("---------------------------------", cmds)
+                  thisVar.config.changed$.pipe(
+                        map(() => thisVar.config.store.qc),
+                        distinctUntilChanged(),
+                    ).subscribe(() => {
+                        // console.log('==================config changed', vueThis)
+                        vueThis.cmds = vueThis.updateCmds()
+                    })
                   return {
-                    cmds: cmds,
+                    cmds: this.updateCmds(),
                   }
                 },
                 methods: {
@@ -79,6 +80,16 @@ export class ClippyService {
                         // console.log(cmd, thisVar.tabs)
                         thisVar.sendCmdToFocusTab(cmd)
                     },
+                    updateCmds() {
+                        let cmds = []
+                        for (let element of thisVar.config.store.qc.cmds) {
+                          // console.log(element)
+                          if (element.group === 'cmds') {
+                              cmds.push(element)
+                          }
+                        }
+                        return cmds
+                    }
                 }
             }).mount('#app')
         }
