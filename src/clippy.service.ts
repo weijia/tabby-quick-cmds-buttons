@@ -29,22 +29,94 @@ export class ClippyService {
         link.href = `${CDN}/assets/clippy.css`
         document.querySelector('head').appendChild(link)
 
-        const vueScript = document.createElement('script')
-        vueScript.src = 'https://cdn.staticfile.org/vue/3.0.5/vue.global.js'
-        document.querySelector('head').appendChild(vueScript)
+        const quasarCss2 = document.createElement('link')
+        quasarCss2.rel = 'stylesheet'
+        quasarCss2.href = `https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons`
+        document.querySelector('head').appendChild(link)
+
+        const quasarCss1 = document.createElement('link')
+        quasarCss1.rel = 'stylesheet'
+        quasarCss1.href = `https://cdn.jsdelivr.net/npm/quasar@2.10.1/dist/quasar.prod.css" rel="stylesheet`
+        document.querySelector('head').appendChild(link)
+
+
+        // const vueScript = document.createElement('script')
+        // vueScript.src = 'https://cdn.staticfile.org/vue/3.0.5/vue.global.js'
+        // document.querySelector('head').appendChild(vueScript)
+
+        const quasarScript1 = document.createElement('script')
+        quasarScript1.src = 'https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js'
+        document.querySelector('head').appendChild(quasarScript1)
+
+        const quasarScript2 = document.createElement('script')
+        quasarScript2.src = 'https://cdn.jsdelivr.net/npm/quasar@2.10.1/dist/quasar.umd.prod.js'
+        document.querySelector('head').appendChild(quasarScript2)
 
         const div = document.createElement('div')
-        div.setAttribute("style", 'position:absolute;top:300px;left:300px;z-index:99999')
+        div.setAttribute("style", 'position:absolute;top:300px;left:500px;z-index:99999')
+        div.setAttribute("id", 'app-parent')
         //const newContent = document.createTextNode("Hi there and greetings!");
         // add the text node to the newly created div
         //div.appendChild(newContent);
 
         div.innerHTML= `
-      <div id="app">{{ message }}</div>
+            <div id="app">
+                <q-btn>Hello world</q-btn>
+                <q-dialog v-model="isVis>
+                    <q-card :style="dialogStyle">
+                        <label @click="sendCmd(cmd)" v-for="cmd in cmds" :key="cmd.name" style="margin:10px">
+                            {{ cmd.name }}
+                        </label>
+                    </q-card>
+                </q-dialog>
+            </div>
         `
 
         document.querySelector('body').appendChild(div)
 
+        // Make the DIV element draggable:
+        dragElement(document.getElementById("app-parent"));
+
+        function dragElement(elmnt) {
+        var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+        if (document.getElementById(elmnt.id + "header")) {
+            // if present, the header is where you move the DIV from:
+            document.getElementById(elmnt.id + "header").onmousedown = dragMouseDown;
+        } else {
+            // otherwise, move the DIV from anywhere inside the DIV:
+            elmnt.onmousedown = dragMouseDown;
+        }
+
+        function dragMouseDown(e) {
+            e = e || window.event;
+            e.preventDefault();
+            // get the mouse cursor position at startup:
+            pos3 = e.clientX;
+            pos4 = e.clientY;
+            document.onmouseup = closeDragElement;
+            // call a function whenever the cursor moves:
+            document.onmousemove = elementDrag;
+        }
+
+        function elementDrag(e) {
+            e = e || window.event;
+            e.preventDefault();
+            // calculate the new cursor position:
+            pos1 = pos3 - e.clientX;
+            pos2 = pos4 - e.clientY;
+            pos3 = e.clientX;
+            pos4 = e.clientY;
+            // set the element's new position:
+            elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+            elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+        }
+
+        function closeDragElement() {
+            // stop moving when mouse button is released:
+            document.onmouseup = null;
+            document.onmousemove = null;
+        }
+        }
 
         setInterval(() => {
             this.agent?.animate()
