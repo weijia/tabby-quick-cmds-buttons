@@ -35,20 +35,25 @@ export class ClippyDecorator extends TerminalDecorator {
         if (tab.session) {
             this.attachToSession(tab.session)
         }
-        console.log(tab)
+        // console.log(tab)
         this.tab = tab
     }
 
     private attachToSession (session: BaseSession) {
         console.log("attached to session", session)
-        
+        let thisVar = this
         session.output$.subscribe(data => {
-            for (let element of this.clippy.config.store.qc.cmds) {
+            for (let element of thisVar.clippy.config.store.qc.cmds) {
                 if (element.group === 'auto') {
-                    console.log(element, this.tab)
+                    console.log(data, element, thisVar.tab)
                     if (data.includes(element.name)) {
                         // this.clippy.speak('It looks like you\'ve typed in an incorrect command. Consider typing in a correct command instead.')
-                        this.tab.sendInput(element.text + (element.appendCR ? "\n" : ""))
+                        // thisVar.tab.sendInput(element.text + (element.appendCR ? "\n" : ""))
+                        thisVar.clippy.sendCmdToFocusTab(element)
+                        console.log('matched, ', data)
+                    }
+                    else {
+                        console.log('not match')
                     }
                 }
             }

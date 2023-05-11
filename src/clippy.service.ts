@@ -53,7 +53,6 @@ export class ClippyService {
 
         let thisVar = this
         
-        
         function initVue(){
             console.log(window.Vue)
             if (!window.Vue) {
@@ -77,12 +76,8 @@ export class ClippyService {
                 methods: {
                     sendCmd(cmd) {
                         // thisVar.tab.sendInput(cmd.text + (cmd.appendCR ? "\n" : ""))
-                        console.log(cmd, thisVar.tabs)
-                        for (let tab of thisVar.tabs) {
-                            if (tab.hasFocus) {
-                                tab.sendInput(cmd.text + (cmd.appendCR ? "\n" : ""))
-                            }
-                        }
+                        // console.log(cmd, thisVar.tabs)
+                        thisVar.sendCmdToFocusTab(cmd)
                     },
                 }
             }).mount('#app')
@@ -144,8 +139,16 @@ export class ClippyService {
         })
     }
 
+    sendCmdToFocusTab(cmd) {
+        for (let tab of this.tabs) {
+            if (tab.hasFocus) {
+                tab.sendInput(cmd.text + (cmd.appendCR ? "\n" : ""))
+            }
+        }
+    }
+    
     addTab (tab: any) {
-        console.log("adding tab")
+        // console.log("adding tab")
         this.tabs.push(tab)
     }
 
