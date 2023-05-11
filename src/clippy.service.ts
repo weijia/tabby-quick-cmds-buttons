@@ -40,31 +40,7 @@ export class ClippyService {
         //div.appendChild(newContent);
 
         div.innerHTML= `
-
-        <script type="importmap">
-        {
-          "imports": {
-            "vue": "https://unpkg.com/vue@3/dist/vue.esm-browser.js"
-          }
-        }
-      </script>
-      
       <div id="app">{{ message }}</div>
-      
-      <script>
-      window.addEventListener("load", function(event) {
-
-      
-        Vue.createApp({
-          data() {
-            return {
-              message: 'Hello Vue!'
-            }
-          }
-        }).mount('#app')
-        // here is the Vue code
-      });
-      </script>
         `
 
         document.querySelector('body').appendChild(div)
