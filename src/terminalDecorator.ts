@@ -38,11 +38,53 @@ export class ClippyDecorator extends TerminalDecorator {
     }
 
     private attachToSession (session: BaseSession) {
+        let thisVar = this
         window.Vue.createApp({
             data() {
-              return {
-                message: 'Hello Vue!'
+              let cmds = []
+              for (var element of thisVar.clippy.config.store.qc.cmds) {
+                // console.log(element)
+                if (element.group === 'cmds') {
+                    cmds.push(element)
+                }
               }
+              console.log("---------------------------------", cmds)
+              return {
+                cmds: cmds,
+                dialogPos: {
+                    x: 300,
+                    y: 300,
+                },
+                dialogArea: {
+                    width: 100,
+                    height: 100,
+                },
+                isVis: true,
+              }
+            },
+            methods: {
+                sendCmd(cmd) {
+                    thisVar.tab.sendInput(cmd.text + (cmd.appendCR ? "\n" : ""))
+                },
+                onPan(evt) {
+                    console.log("onPan--------------------")
+                    this.dialogPos.value.x = this.dialogPos.value.x + evt.delta.x
+                    this.dialogPos.value.y = this.dialogPos.value.y + evt.delta.y
+                }
+            },
+            mounted() {
+                console.log(`the component is now mounted.`)
+                // console.log(document.querySelector('#app'), this.$el, this)
+                // document.querySelector('#app').parentNode["style"] = this.dialogStyle
+            },
+            computed: {
+                dialogStyle() {
+                    console.log(this.dialogPos)
+                    // const res =  `top:${this.dialogPos.x}px;left:${this.dialogPos.y}px;position:absolute;z-index:99999`
+                    const res =  `transform: translate(${this.dialogPos.x}px, ${this.dialogPos.y}px); width:${this.dialogArea.width}px; height:${this.dialogArea.height}px;`
+                    console.log(res)
+                    return res
+                }
             }
         }).mount('#app')
         session.output$.subscribe(data => {
@@ -50,7 +92,7 @@ export class ClippyDecorator extends TerminalDecorator {
                 if (element.group === 'auto') {
                     if (data.includes(element.name)) {
                         // this.clippy.speak('It looks like you\'ve typed in an incorrect command. Consider typing in a correct command instead.')
-                        this.tab.sendInput(element.text + (element ? "\n" : ""))
+                        this.tab.sendInput(element.text + (element.appendCR ? "\n" : ""))
                     }
                 }
             }
