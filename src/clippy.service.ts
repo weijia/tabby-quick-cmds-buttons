@@ -43,9 +43,9 @@ export class ClippyService {
 
         div.innerHTML= `
             <div id="app">
-                        <label @click="sendCmd(cmd)" v-for="cmd in cmds" :key="cmd.name" style="margin:10px">
+                        <button @click="sendCmd(cmd)" v-for="cmd in cmds" :key="cmd.name" style="margin:10px">
                             {{ cmd.name }}
-                        </label>
+                        </button>
             </div>
         `
 
@@ -54,7 +54,7 @@ export class ClippyService {
         let thisVar = this
         
         function initVue(){
-            console.log(window.Vue)
+            // console.log(window.Vue)
             if (!window.Vue) {
                 setTimeout(initVue, 1000);
                 return
@@ -68,7 +68,7 @@ export class ClippyService {
                         cmds.push(element)
                     }
                   }
-                  console.log("---------------------------------", cmds)
+                //   console.log("---------------------------------", cmds)
                   return {
                     cmds: cmds,
                   }
