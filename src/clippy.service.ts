@@ -10,6 +10,7 @@ export class ClippyService {
     private visible = true
     private agent: any
     private logger: Logger
+    public  tabs = []
 
     constructor (
         public config: ConfigService,
@@ -50,11 +51,49 @@ export class ClippyService {
 
         document.querySelector('body').appendChild(div)
 
+        let thisVar = this
+        
+        
+        function initVue(){
+            console.log(window.Vue)
+            if (!window.Vue) {
+                setTimeout(initVue, 1000);
+                return
+            }
+            window.Vue.createApp({
+                data() {
+                  let cmds = []
+                  for (let element of thisVar.config.store.qc.cmds) {
+                    // console.log(element)
+                    if (element.group === 'cmds') {
+                        cmds.push(element)
+                    }
+                  }
+                  console.log("---------------------------------", cmds)
+                  return {
+                    cmds: cmds,
+                  }
+                },
+                methods: {
+                    sendCmd(cmd) {
+                        // thisVar.tab.sendInput(cmd.text + (cmd.appendCR ? "\n" : ""))
+                        console.log(cmd, thisVar.tabs)
+                        for (let tab of thisVar.tabs) {
+                            if (tab.hasFocus) {
+                                tab.sendInput(cmd.text + (cmd.appendCR ? "\n" : ""))
+                            }
+                        }
+                    },
+                }
+            }).mount('#app')
+        }
+        setTimeout(initVue, 1000);
+
         // Make the DIV element draggable:
         dragElement(document.getElementById("app-parent"));
 
         function dragElement(elmnt) {
-        var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+        let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
         if (document.getElementById(elmnt.id + "header")) {
             // if present, the header is where you move the DIV from:
             document.getElementById(elmnt.id + "header").onmousedown = dragMouseDown;
@@ -103,6 +142,11 @@ export class ClippyService {
                 this.toggle()
             }
         })
+    }
+
+    addTab (tab: any) {
+        console.log("adding tab")
+        this.tabs.push(tab)
     }
 
     async loadAgent () {
