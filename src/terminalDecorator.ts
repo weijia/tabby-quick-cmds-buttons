@@ -5,6 +5,7 @@ import { ClippyService } from './clippy.service'
 
 @Injectable()
 export class ClippyDecorator extends TerminalDecorator {
+    private tab: BaseTerminalTabComponent
     constructor (
         private clippy: ClippyService,
     ) {
@@ -25,13 +26,27 @@ export class ClippyDecorator extends TerminalDecorator {
         if (tab.session) {
             this.attachToSession(tab.session)
         }
+        console.log(tab)
+        this.tab = tab
     }
 
     private attachToSession (session: BaseSession) {
+
         session.output$.subscribe(data => {
-            if (data.includes('command not found')) {
-                this.clippy.speak('It looks like you\'ve typed in an incorrect command. Consider typing in a correct command instead.')
+            for (var element of this.clippy.config.store.qc.cmds) {
+                if (element.group === 'auto') {
+                    if (data.includes(element.name)) {
+                        // this.clippy.speak('It looks like you\'ve typed in an incorrect command. Consider typing in a correct command instead.')
+                        this.tab.sendInput(element.text + (element ? "\n" : ""))
+                    }
+                }
             }
         })
+        
+        // session.output$.subscribe(data => {
+        //     if (data.includes('command not found')) {
+        //         this.clippy.speak('It looks like you\'ve typed in an incorrect command. Consider typing in a correct command instead.')
+        //     }
+        // })
     }
 }

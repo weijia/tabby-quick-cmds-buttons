@@ -12,7 +12,7 @@ export class ClippyService {
     private logger: Logger
 
     constructor (
-        private config: ConfigService,
+        public config: ConfigService,
         log: LogService,
         hotkeys: HotkeysService,
     ) {
@@ -51,16 +51,19 @@ export class ClippyService {
       
       <div id="app">{{ message }}</div>
       
-      <script type="module">
-        import { createApp } from 'vue'
+      <script>
+      window.addEventListener("load", function(event) {
+
       
-        createApp({
+        Vue.createApp({
           data() {
             return {
               message: 'Hello Vue!'
             }
           }
         }).mount('#app')
+        // here is the Vue code
+      });
       </script>
         `
 
