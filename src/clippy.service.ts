@@ -2,6 +2,7 @@ import clippy from 'clippyjs'
 import { distinctUntilChanged, map } from 'rxjs'
 import { Injectable } from '@angular/core'
 import { Logger, LogService, ConfigService, HotkeysService } from 'tabby-core'
+import { createApp } from 'vue'
 
 const CDN = 'https://gitee.com/weijia432/clippyjs/raw/master/'
 
@@ -30,9 +31,9 @@ export class ClippyService {
         link.href = `${CDN}/assets/clippy.css`
         document.querySelector('head').appendChild(link)
 
-        const vueScript = document.createElement('script')
-        vueScript.src = 'https://cdn.staticfile.org/vue/3.0.5/vue.global.js'
-        document.querySelector('head').appendChild(vueScript)
+        // const vueScript = document.createElement('script')
+        // vueScript.src = 'https://cdn.staticfile.org/vue/3.0.5/vue.global.js'
+        // document.querySelector('head').appendChild(vueScript)
 
         const div = document.createElement('div')
         div.setAttribute("style", 'position:absolute;top:800px;left:1000px;z-index:99999')
@@ -55,11 +56,11 @@ export class ClippyService {
         
         function initVue(){
             // console.log(window.Vue)
-            if (!window.Vue) {
-                setTimeout(initVue, 1000);
-                return
-            }
-            window.Vue.createApp({
+            // if (false) {
+            //     setTimeout(initVue, 1000);
+            //     return
+            // }
+            createApp({
                 data() {
                   let vueThis = this
                   //   console.log("---------------------------------", cmds)
