@@ -1,7 +1,7 @@
 {
-  "name": "tabby-clippy",
-  "version": "1.0.0",
-  "description": "An example plugin that annoys you.",
+  "name": "tabby-quick-cmd-buttons",
+  "version": "1.0.1",
+  "description": "An plugin that create buttons for quick commands, based on Eugene Pankov's tabby-clippy",
   "keywords": [
     "tabby-plugin"
   ],
@@ -15,7 +15,7 @@
   "files": [
     "dist"
   ],
-  "author": "Eugene Pankov",
+  "author": "Richard",
   "license": "MIT",
   "devDependencies": {
     "@angular/animations": "^12.0.0",

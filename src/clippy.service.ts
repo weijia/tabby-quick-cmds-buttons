@@ -49,13 +49,18 @@ export class ClippyService {
                 },
                 updateCmds() {
                     let cmds = []
+                    let allCmds = []
                     for (let element of thisVar.config.store.qc.cmds) {
                         // console.log(element)
                         if (element.group === 'cmds') {
                             cmds.push(element)
                         }
+                        allCmds.push(element)
                     }
-                    return cmds
+                    if (cmds.length > 0) {
+                        return cmds
+                    }
+                    return allCmds
                 }
             }
         }).mount('#app')
