@@ -1,6 +1,6 @@
 {
-  "name": "tabby-quick-cmd-buttons",
-  "version": "1.0.1",
+  "name": "tabby-quick-cmds-buttons",
+  "version": "1.0.2",
   "description": "An plugin that create buttons for quick commands, based on Eugene Pankov's tabby-clippy",
   "keywords": [
     "tabby-plugin"

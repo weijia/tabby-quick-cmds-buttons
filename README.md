@@ -1,13 +1,8 @@
-# Clippy (example plugin)
+# Tabby Quick Cmd Buttons
+# Please install quick-cmds plugin first
 
 #### For the Tabby terminal
 
 ![Screenshot](./screenshot.png)
 
-This plugin demonstrates:
-
-* Terminal decorators
-* Hotkeys
-* Context menu items
-* Config file options
-* Setting tabs
+This plugin create buttons for quick commands, based on Eugene Pankov's tabby-clippy

@@ -8,7 +8,7 @@ import { ClippySettingsTabComponent } from './settingsTab.component'
 export class ClippySettingsTabProvider extends SettingsTabProvider {
     id = 'clippy'
     icon = 'paperclip'
-    title = 'Clippy'
+    title = 'Quick Cmd Buttons'
 
     getComponentType (): any {
         return ClippySettingsTabComponent
