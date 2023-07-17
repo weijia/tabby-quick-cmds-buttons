@@ -11,7 +11,7 @@ export class ClippyService {
         public config: ConfigService,
     ) {
         const div = document.createElement('div')
-        div.setAttribute("style", 'position:absolute;top:800px;left:1000px;z-index:99999')
+        div.setAttribute("style", 'position:absolute;top:500px;left:1000px;z-index:99999')
         div.setAttribute("id", 'app-parent')
 
         div.innerHTML= `
