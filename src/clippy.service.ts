@@ -29,12 +29,13 @@ export class ClippyService {
         createApp({
             data() {
                 let vueThis = this
-                //   console.log("---------------------------------", cmds)
+                console.log("---------------------------------", vueThis)
+                console.log("---------------------------------", thisVar)
                 thisVar.config.changed$.pipe(
                     map(() => thisVar.config.store.qc),
                     distinctUntilChanged(),
                 ).subscribe(() => {
-                    // console.log('==================config changed', vueThis)
+                    console.log('==================config changed', vueThis)
                     vueThis.cmds = vueThis.updateCmds()
                 })
                 return {
@@ -50,12 +51,14 @@ export class ClippyService {
                 updateCmds() {
                     let cmds = []
                     let allCmds = []
-                    for (let element of thisVar.config.store.qc.cmds) {
-                        // console.log(element)
-                        if (element.group === 'cmds') {
-                            cmds.push(element)
+                    if(thisVar.config.store){
+                        for (let element of thisVar.config.store.qc.cmds) {
+                            // console.log(element)
+                            if (element.group === 'cmds') {
+                                cmds.push(element)
+                            }
+                            allCmds.push(element)
                         }
-                        allCmds.push(element)
                     }
                     if (cmds.length > 0) {
                         return cmds
