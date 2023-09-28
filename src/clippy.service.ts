@@ -31,6 +31,10 @@ export class ClippyService {
                 let vueThis = this
                 console.log("---------------------------------", vueThis)
                 console.log("---------------------------------", thisVar)
+                thisVar.config.ready$.subscribe(()=>{
+                    console.log("---------------------------------", thisVar, thisVar.config, thisVar.config.store);
+                    vueThis.cmds = vueThis.updateCmds();
+                });
                 thisVar.config.changed$.pipe(
                     map(() => thisVar.config.store.qc),
                     distinctUntilChanged(),
