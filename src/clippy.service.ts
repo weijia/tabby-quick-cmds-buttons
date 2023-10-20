@@ -1,4 +1,3 @@
-import { distinctUntilChanged, map } from 'rxjs'
 import { Injectable } from '@angular/core'
 import { ConfigService } from 'tabby-core'
 import { createApp } from 'vue'
@@ -35,10 +34,7 @@ export class ClippyService {
                     console.log("---------------------------------", thisVar, thisVar.config, thisVar.config.store);
                     vueThis.cmds = vueThis.updateCmds();
                 });
-                thisVar.config.changed$.pipe(
-                    map(() => thisVar.config.store.qc),
-                    distinctUntilChanged(),
-                ).subscribe(() => {
+                thisVar.config.changed$.subscribe(() => {
                     console.log('==================config changed', vueThis)
                     vueThis.cmds = vueThis.updateCmds()
                 })
@@ -121,7 +117,7 @@ export class ClippyService {
     sendCmdToFocusTab(cmd) {
         for (let tab of this.tabs) {
             if (tab.hasFocus) {
-                tab.sendInput(cmd.text + (cmd.appendCR ? "\n" : ""))
+                tab.sendInput(cmd.text + (cmd.appendCR ? "\r" : ""))
             }
         }
     }
