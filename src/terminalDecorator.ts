@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core'
 import { TerminalDecorator, BaseTerminalTabComponent, BaseSession } from 'tabby-terminal'
-import { ClippyService } from './clippy.service'
+import { CmdBtnService } from './cmd_btn.service'
 
 
 @Injectable()
 export class ClippyDecorator extends TerminalDecorator {
     // private tab: BaseTerminalTabComponent
     constructor (
-        private clippy: ClippyService,
+        private clippy: CmdBtnService,
     ) {
         super()
     }
