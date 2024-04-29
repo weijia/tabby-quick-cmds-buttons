@@ -11,7 +11,7 @@ module.exports = {
     filename: 'index.js',
     pathinfo: true,
     libraryTarget: 'umd',
-    devtoolModuleFilenameTemplate: 'webpack-tabby-clippy:///[resource-path]',
+    devtoolModuleFilenameTemplate: 'tabby-quick-cmds-buttons:///[resource-path]',
   },
   resolve: {
     modules: ['.', 'src', 'node_modules'].map(x => path.join(__dirname, x)),
@@ -28,6 +28,10 @@ module.exports = {
       },
       {
         test: /\.scss/,
+        use: ['style-loader', 'css-loader', 'sass-loader'],
+      },
+      {
+        test: /\.css$/,
         use: ['style-loader', 'css-loader', 'sass-loader'],
       },
       { test: /\.pug$/, use: ['apply-loader', 'pug-loader'] },

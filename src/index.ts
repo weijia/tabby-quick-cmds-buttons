@@ -5,12 +5,12 @@ import TabbyCoreModule, { ConfigProvider, HotkeyProvider, TabContextMenuItemProv
 import { TerminalDecorator } from 'tabby-terminal'
 import { SettingsTabProvider } from 'tabby-settings'
 
-import { ClippyConfigProvider } from './configProvider'
-import { ClippySettingsTabProvider } from './settingsTabProvider'
-import { ClippySettingsTabComponent } from './settingsTab.component'
-import { ClippyDecorator } from './terminalDecorator'
-import { ClippyHotkeyProvider } from './hotkeyProvider'
-import { ClippyContextMenuProvider } from './contextMenu'
+import { QuickCmdBtnConfigProvider } from './configProvider'
+import { QuickCmdBtnSettingsTabProvider } from './settingsTabProvider'
+import { QuickCmdBtnSettingsTabComponent } from './settingsTab.component'
+import { QuickCmdBtnDecorator } from './terminalDecorator'
+import { QuickCmdBtnHotkeyProvider } from './hotkeyProvider'
+import { QuickCmdBtnContextMenuProvider } from './contextMenu'
 
 @NgModule({
     imports: [
@@ -19,17 +19,17 @@ import { ClippyContextMenuProvider } from './contextMenu'
         TabbyCoreModule,
     ],
     providers: [
-        { provide: TabContextMenuItemProvider, useClass: ClippyContextMenuProvider, multi: true },
-        { provide: HotkeyProvider, useClass: ClippyHotkeyProvider, multi: true },
-        { provide: ConfigProvider, useClass: ClippyConfigProvider, multi: true },
-        { provide: SettingsTabProvider, useClass: ClippySettingsTabProvider, multi: true },
-        { provide: TerminalDecorator, useClass: ClippyDecorator, multi: true },
+        { provide: TabContextMenuItemProvider, useClass: QuickCmdBtnContextMenuProvider, multi: true },
+        { provide: HotkeyProvider, useClass: QuickCmdBtnHotkeyProvider, multi: true },
+        { provide: ConfigProvider, useClass: QuickCmdBtnConfigProvider, multi: true },
+        { provide: SettingsTabProvider, useClass: QuickCmdBtnSettingsTabProvider, multi: true },
+        { provide: TerminalDecorator, useClass: QuickCmdBtnDecorator, multi: true },
     ],
     entryComponents: [
-        ClippySettingsTabComponent,
+        QuickCmdBtnSettingsTabComponent,
     ],
     declarations: [
-        ClippySettingsTabComponent,
+        QuickCmdBtnSettingsTabComponent,
     ],
 })
-export default class ClippyModule { }
+export default class QuickCmdBtnModule { }

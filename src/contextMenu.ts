@@ -4,11 +4,11 @@ import { BaseTerminalTabComponent, TerminalContextMenuItemProvider } from 'tabby
 import { CmdBtnService } from './cmd_btn.service'
 
 @Injectable()
-export class ClippyContextMenuProvider extends TerminalContextMenuItemProvider {
+export class QuickCmdBtnContextMenuProvider extends TerminalContextMenuItemProvider {
     weight = 10
 
     constructor (
-        private clippy: CmdBtnService,
+        private quickCmdBtn: CmdBtnService,
     ) {
         super()
     }
@@ -16,9 +16,9 @@ export class ClippyContextMenuProvider extends TerminalContextMenuItemProvider {
     async getItems (tab: BaseTerminalTabComponent): Promise<MenuItemOptions[]> {
         return [
             {
-                label: 'Toggle Clippy',
+                label: 'Toggle QuickCmdBtn',
                 click: () => {
-                    console.log(this.clippy, tab)
+                    console.log(this.quickCmdBtn, tab)
                 },
             },
         ]

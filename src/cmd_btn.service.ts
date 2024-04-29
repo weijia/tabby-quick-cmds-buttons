@@ -1,6 +1,11 @@
 import { Injectable } from '@angular/core'
 import { ConfigService } from 'tabby-core'
 import { createApp } from 'vue'
+import {Tabs, Tab} from 'vue3-tabs-component';
+import PrimeVue from 'primevue/config';
+import 'primevue/resources/primevue.min.css';
+import 'primevue/resources/themes/saga-blue/theme.css'; // Choose your preferred theme
+import 'tabs-component.css';
 
 @Injectable({ providedIn: 'root'})
 export class CmdBtnService {
@@ -15,10 +20,42 @@ export class CmdBtnService {
 
         div.innerHTML= `
             <div id="app">
+                <style lang="scss">
+                /* Global styles */
+                .tabs {
+                    display: flex;
+                    flex-direction: column;
+                    border: 1px solid #ccc;
+                  }
+                  
+                  .tab {
+                    padding: 10px;
+                    cursor: pointer;
+                  }
+                  
+                  .tab.active {
+                    background-color: #007bff;
+                    color: white;
+                  }
+                  
+                  .tab-content {
+                    padding: 10px;
+                    border-top: 1px solid #ccc;
+                  }
+                </style>
                 <div>
-                    <button @click="sendCmd(cmd)" v-for="cmd in cmds" :key="cmd.name" style="margin:10px">
-                        {{ cmd.name }}
-                    </button>
+                    <tabs :options="{ useUrlFragment: false }" >
+                        <tab v-bind:name="cmdGroup" v-for="(cmds, cmdGroup) in tabToCmds" :key="cmdGroup">
+                            <div>
+                                <button @click="sendCmd(cmd)" v-for="cmd in cmds" :key="cmd.name" style="margin:10px">
+                                    {{ cmd.name }}
+                                </button>
+                            </div>
+                        </tab>
+                        <tab name="History" suffix=" <span class='badge'>Fixed</span>" :is-disabled="true">
+                            This is the content of the second tab
+                        </tab>
+                    </tabs>
                 </div>
             </div>
         `
@@ -27,21 +64,21 @@ export class CmdBtnService {
 
         let thisVar = this
         
-        createApp({
+        const app = createApp({
             data() {
                 let vueThis = this
                 console.log("---------------------------------", vueThis)
                 console.log("---------------------------------", thisVar)
                 thisVar.config.ready$.subscribe(()=>{
                     console.log("---------------------------------", thisVar, thisVar.config, thisVar.config.store);
-                    vueThis.cmds = vueThis.updateCmds();
+                    vueThis.tabToCmds = vueThis.updateCmds();
                 });
                 thisVar.config.changed$.subscribe(() => {
                     console.log('==================config changed', vueThis)
-                    vueThis.cmds = vueThis.updateCmds()
+                    vueThis.tabToCmds = vueThis.updateCmds()
                 })
                 return {
-                cmds: this.updateCmds(),
+                    tabToCmds: this.updateCmds(),
                 }
             },
             methods: {
@@ -51,24 +88,27 @@ export class CmdBtnService {
                     thisVar.sendCmdToFocusTab(cmd)
                 },
                 updateCmds() {
-                    let cmds = []
-                    let allCmds = []
+                    const tabToCmds: { [key: string]: any } = {};
                     if(thisVar.config.store){
                         for (let element of thisVar.config.store.qc.cmds) {
                             // console.log(element)
-                            if (element.group === 'cmds') {
-                                cmds.push(element)
+                            if (!tabToCmds.hasOwnProperty(element.group)) {
+                                tabToCmds[element.group] = []
+                                // console.log(JSON.stringify(tabToCmds))
                             }
-                            allCmds.push(element)
+                            tabToCmds[element.group].push(element)
+                            // console.log(JSON.stringify(tabToCmds))
                         }
                     }
-                    if (cmds.length > 0) {
-                        return cmds
-                    }
-                    return allCmds
+                    // console.log("returning:", tabToCmds)
+                    return tabToCmds
                 }
             }
-        }).mount('#app')
+        })
+        app.use(PrimeVue);
+        app.component('tabs', Tabs)
+        .component('tab', Tab)
+        .mount('#app');
 
 
         // Make the DIV element draggable:

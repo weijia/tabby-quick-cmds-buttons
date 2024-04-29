@@ -1,13 +1,13 @@
 import { ConfigProvider } from 'tabby-core'
 
 /** @hidden */
-export class ClippyConfigProvider extends ConfigProvider {
+export class QuickCmdBtnConfigProvider extends ConfigProvider {
     defaults = {
-        clippyPlugin: {
-            agent: 'Clippy',
+        quickCmdBtnPlugin: {
+            agent: 'QuickButton',
         },
         hotkeys: {
-            'toggle-clippy': [],
+            'toggle-tabs': [],
         },
     }
 }

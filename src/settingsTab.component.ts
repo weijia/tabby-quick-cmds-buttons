@@ -5,10 +5,10 @@ import { ConfigService } from 'tabby-core'
 @Component({
     template: require('./settingsTab.component.pug'),
 })
-export class ClippySettingsTabComponent {
+export class QuickCmdBtnSettingsTabComponent {
     agents = [
         'Bonzi',
-        'Clippy',
+        'QuickCmdBtn',
         'F1',
         'Genie',
         'Genius',

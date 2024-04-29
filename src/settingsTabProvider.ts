@@ -1,16 +1,16 @@
 import { Injectable } from '@angular/core'
 import { SettingsTabProvider } from 'tabby-settings'
 
-import { ClippySettingsTabComponent } from './settingsTab.component'
+import { QuickCmdBtnSettingsTabComponent } from './settingsTab.component'
 
 /** @hidden */
 @Injectable()
-export class ClippySettingsTabProvider extends SettingsTabProvider {
-    id = 'clippy'
+export class QuickCmdBtnSettingsTabProvider extends SettingsTabProvider {
+    id = 'QuickCmdBtn'
     icon = 'paperclip'
     title = 'Quick Cmd Buttons'
 
     getComponentType (): any {
-        return ClippySettingsTabComponent
+        return QuickCmdBtnSettingsTabComponent
     }
 }
