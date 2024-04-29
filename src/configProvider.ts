@@ -4,7 +4,7 @@ import { ConfigProvider } from 'tabby-core'
 export class QuickCmdBtnConfigProvider extends ConfigProvider {
     defaults = {
         quickCmdBtnPlugin: {
-            agent: 'QuickButton',
+            disableTabs: false,
         },
         hotkeys: {
             'toggle-tabs': [],

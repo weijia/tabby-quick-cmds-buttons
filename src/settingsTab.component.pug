@@ -2,10 +2,11 @@ h3 QuickCmdBtn
 
 .form-line
     .header
-        .title Agent type
-        .description Select agent appearance
-    select.form-control(
-        [(ngModel)]='config.store.quickCmdButtonPlugin.agent',
+        .title Disable tabs
+        .description Disable tabs for buttons
+
+    toggle.ml-1(
+        title="Disable tabs for buttons",
+        [(ngModel)]='disableTabs',
         (ngModelChange)='config.save()'
     )
-        option([ngValue]='agent', *ngFor='let agent of agents') {{agent}}
