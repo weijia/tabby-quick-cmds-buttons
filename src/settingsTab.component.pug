@@ -7,6 +7,6 @@ h3 QuickCmdBtn
 
     toggle.ml-1(
         title="Disable tabs for buttons",
-        [(ngModel)]='disableTabs',
+        [(ngModel)]='config.store.quickCmdBtnPlugin.disableTabs',
         (ngModelChange)='config.save()'
     )
