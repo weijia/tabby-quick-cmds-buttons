@@ -43,7 +43,7 @@
     cursor: not-allowed !important;
 }
 
-@media (min-width: 700px) {
+@media (min-width: 50px) {
     .tabs-component-tab, .tabs-component-tab--custom {
         background-color: #fff;
         border: solid 1px #ddd;
@@ -72,7 +72,7 @@
     padding: 4em 0;
 }
 
-@media (min-width: 700px) {
+@media (min-width: 50px) {
     .tabs-component-panels {
         background-color: #fff;
         border: solid 1px #ddd;

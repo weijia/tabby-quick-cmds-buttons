@@ -20,30 +20,12 @@ export class CmdBtnService {
 
         div.innerHTML= `
             <div id="app">
-                <style lang="scss">
-                /* Global styles */
-                .tabs {
-                    display: flex;
-                    flex-direction: column;
-                    border: 1px solid #ccc;
-                  }
-                  
-                  .tab {
-                    padding: 10px;
-                    cursor: pointer;
-                  }
-                  
-                  .tab.active {
-                    background-color: #007bff;
-                    color: white;
-                  }
-                  
-                  .tab-content {
-                    padding: 10px;
-                    border-top: 1px solid #ccc;
-                  }
-                </style>
-                <div>
+                <div v-show="isTabVisible===false">
+                    <button @click="sendCmd(cmd)" v-for="cmd in cmds" :key="cmd.name" style="margin:10px">
+                        {{ cmd.name }}
+                    </button>
+                </div>
+                <div v-show="isTabVisible">
                     <tabs :options="{ useUrlFragment: false }" >
                         <tab v-bind:name="cmdGroup" v-for="(cmds, cmdGroup) in tabToCmds" :key="cmdGroup">
                             <div>
@@ -66,21 +48,34 @@ export class CmdBtnService {
         
         const app = createApp({
             data() {
+                // This function will be called only once.
                 let vueThis = this
                 console.log("---------------------------------", vueThis)
                 console.log("---------------------------------", thisVar)
                 thisVar.config.ready$.subscribe(()=>{
                     console.log("---------------------------------", thisVar, thisVar.config, thisVar.config.store);
                     vueThis.tabToCmds = vueThis.updateCmds();
+                    vueThis.isTabVisible = vueThis.getIsVisible()
+                    vueThis.cmds = vueThis.getCmds()
                 });
                 thisVar.config.changed$.subscribe(() => {
                     console.log('==================config changed', vueThis)
                     vueThis.tabToCmds = vueThis.updateCmds()
+                    vueThis.isTabVisible = vueThis.getIsVisible()
+                    vueThis.cmds = vueThis.getCmds()
                 })
                 return {
                     tabToCmds: this.updateCmds(),
+                    isTabVisible: this.getIsVisible(),
+                    cmds: this.getCmds(),
                 }
             },
+            // computed: {
+            //     cmds: (vm) => {
+            //         let cmds = []
+            //         for(const group in vueThis.tabToCmds) 
+            //     }
+            // },
             methods: {
                 sendCmd(cmd) {
                     // thisVar.tab.sendInput(cmd.text + (cmd.appendCR ? "\n" : ""))
@@ -102,6 +97,24 @@ export class CmdBtnService {
                     }
                     // console.log("returning:", tabToCmds)
                     return tabToCmds
+                },
+                getIsVisible() {
+                    var isTabVisible = null
+                    console.log(thisVar.config.store)
+                    if (thisVar.config.store && thisVar.config.store.quickCmdBtnPlugin) {
+                        isTabVisible = !thisVar.config.store.quickCmdBtnPlugin.disableTabs
+                    }
+                    console.log("returning: ", isTabVisible)
+                    return isTabVisible
+                },
+                getCmds() {
+                    let cmds = []
+                    if(thisVar.config.store){
+                        for (let element of thisVar.config.store.qc.cmds) {
+                            cmds.push(element)
+                        }
+                    }
+                    return cmds
                 }
             }
         })
