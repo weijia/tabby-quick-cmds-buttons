@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core'
 import { ConfigService } from 'tabby-core'
 import { createApp } from 'vue'
+// import { ref } from 'vue'
 import {Tabs, Tab} from 'vue3-tabs-component';
 import PrimeVue from 'primevue/config';
 import 'primevue/resources/primevue.min.css';
@@ -26,7 +27,7 @@ export class CmdBtnService {
                     </button>
                 </div>
                 <div v-show="isTabVisible">
-                    <tabs :options="{ useUrlFragment: false }" >
+                    <tabs ref="cmdTabs" :options="{ useUrlFragment: false }" >
                         <tab v-bind:name="cmdGroup" v-for="(cmds, cmdGroup) in tabToCmds" :key="cmdGroup">
                             <div>
                                 <button @click="sendCmd(cmd)" v-for="cmd in cmds" :key="cmd.name" style="margin:10px">
@@ -45,21 +46,33 @@ export class CmdBtnService {
         
         const app = createApp({
             data() {
+                // const cmdTabs = ref(null)
                 // This function will be called only once.
                 let vueThis = this
-                console.log("---------------------------------", vueThis)
+                console.log("---------------------------------data called", vueThis)
                 console.log("---------------------------------", thisVar)
                 thisVar.config.ready$.subscribe(()=>{
-                    console.log("---------------------------------", thisVar, thisVar.config, thisVar.config.store);
-                    vueThis.tabToCmds = vueThis.updateCmds();
+                    console.log("---------------------------------config.ready", 
+                        thisVar, thisVar.config, thisVar.config.store,
+                        vueThis, vueThis.$refs.cmdTabs)
+                    // if(vueThis.$refs.cmdTabs.value) {
+                    //     console.log(vueThis.$refs.cmdTabs.value,
+                    //         vueThis.$refs.cmdTabs.value.selectTab("helm"))
+                    // }
+                    const tabToCmds = vueThis.updateCmds();
+                    vueThis.$refs.cmdTabs.selectTab("#"+Object.keys(tabToCmds)[0])
+                    vueThis.tabToCmds = tabToCmds
                     vueThis.isTabVisible = vueThis.getIsVisible()
                     vueThis.cmds = vueThis.getCmds()
                 });
                 thisVar.config.changed$.subscribe(() => {
                     console.log('==================config changed', vueThis)
-                    vueThis.tabToCmds = vueThis.updateCmds()
+                    const tabToCmds = vueThis.updateCmds();
+                    vueThis.$refs.cmdTabs.selectTab("#"+Object.keys(tabToCmds)[0])
+                    vueThis.tabToCmds = tabToCmds
                     vueThis.isTabVisible = vueThis.getIsVisible()
                     vueThis.cmds = vueThis.getCmds()
+                    // console.log(vueThis.$refs.cmdTabs.selectTab)
                 })
                 return {
                     tabToCmds: this.updateCmds(),
