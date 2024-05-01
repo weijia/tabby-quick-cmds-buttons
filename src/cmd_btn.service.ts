@@ -34,9 +34,6 @@ export class CmdBtnService {
                                 </button>
                             </div>
                         </tab>
-                        <tab name="History" suffix=" <span class='badge'>Fixed</span>" :is-disabled="true">
-                            This is the content of the second tab
-                        </tab>
                     </tabs>
                 </div>
             </div>
