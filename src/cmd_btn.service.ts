@@ -45,6 +45,10 @@ export class CmdBtnService {
         let thisVar = this
         
         const app = createApp({
+            mounted: function(){
+                console.log("====================mounted", this, "#"+Object.keys(this.tabToCmds)[0])
+                this.$refs.cmdTabs.selectTab("#"+Object.keys(this.tabToCmds)[0])
+            },
             data() {
                 // const cmdTabs = ref(null)
                 // This function will be called only once.
@@ -60,7 +64,17 @@ export class CmdBtnService {
                     //         vueThis.$refs.cmdTabs.value.selectTab("helm"))
                     // }
                     const tabToCmds = vueThis.updateCmds();
-                    vueThis.$refs.cmdTabs.selectTab("#"+Object.keys(tabToCmds)[0])
+                    // if(vueThis.$refs && vueThis.$refs.cmdTabs) {
+                        // const firstGroup = "#"+Object.keys(tabToCmds)[0]
+                        // console.log(vueThis.$refs.cmdTabs.selectTab, firstGroup)
+                        // vueThis.$refs.cmdTabs.selectTab(firstGroup)
+                        setTimeout(() => {
+                            console.log("next tick:", vueThis.$refs)
+                            const firstGroup = "#"+Object.keys(tabToCmds)[0]
+                            console.log(vueThis.$refs.cmdTabs.selectTab, firstGroup)
+                            vueThis.$refs.cmdTabs.selectTab(firstGroup)
+                        }, 3000);
+                    // }
                     vueThis.tabToCmds = tabToCmds
                     vueThis.isTabVisible = vueThis.getIsVisible()
                     vueThis.cmds = vueThis.getCmds()
