@@ -23,6 +23,7 @@ jobs:
       #- run: npm publish --provenance --access public
       #  env:
       #    NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      
       # 如果你的项目需要构建，可以在这里添加构建步骤  
   
       - run: npm config set //registry.npmjs.org/:_authToken=${NPM_TOKEN}  
