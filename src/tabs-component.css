@@ -19,7 +19,8 @@
 }
 
 .tabs-component-tab, .tabs-component-tab--custom {
-    color: #999;
+    /*color: #999;*/
+    color: var(--theme-fg-more-2);
     font-size: 14px;
     font-weight: 600;
     margin-right: 0;
@@ -45,7 +46,7 @@
 
 @media (min-width: 50px) {
     .tabs-component-tab, .tabs-component-tab--custom {
-        background-color: #fff;
+        background-color: var(--bs-body-bg);
         border: solid 1px #ddd;
         border-radius: 3px 3px 0 0;
         margin-right: .5em;
@@ -62,7 +63,7 @@
 
 .tabs-component-tab-a, .tabs-component-tab-a--custom {
     align-items: center;
-    color: inherit;
+    color: var(--theme-fg);
     display: flex;
     padding: .75em 1em;
     text-decoration: none;
@@ -74,7 +75,7 @@
 
 @media (min-width: 50px) {
     .tabs-component-panels {
-        background-color: #fff;
+        background-color: var(--bs-body-bg);
         border: solid 1px #ddd;
         border-radius: 0 6px 6px 6px;
         box-shadow: 0 0 10px rgba(0, 0, 0, .05);
