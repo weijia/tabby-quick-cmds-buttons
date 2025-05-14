@@ -10,3 +10,14 @@ h3 QuickCmdBtn
         [(ngModel)]='config.store.quickCmdBtnPlugin.disableTabs',
         (ngModelChange)='config.save()'
     )
+
+.form-line
+    .header
+        .title Use system theme
+        .description Use system theme
+
+    toggle.ml-1(
+        title="Use system theme",
+        [(ngModel)]='config.store.quickCmdBtnPlugin.useSystemTheme',
+        (ngModelChange)='config.save()'
+    )

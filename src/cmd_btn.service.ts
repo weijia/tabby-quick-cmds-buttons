@@ -21,12 +21,12 @@ export class CmdBtnService {
 
         div.innerHTML= `
             <div id="app">
-                <div v-show="isTabVisible===false">
+                <div v-show="isTabVisible===false" :class="{'use-fixed-theme': !isUseSystemTheme}">
                     <button @click="sendCmd(cmd)" v-for="cmd in cmds" :key="cmd.name" style="margin:10px">
                         {{ cmd.name }}
                     </button>
                 </div>
-                <div v-show="isTabVisible">
+                <div v-show="isTabVisible" :class="{'use-fixed-theme': !isUseSystemTheme}">
                     <tabs ref="cmdTabs" :options="{ useUrlFragment: false }" >
                         <tab v-bind:name="cmdGroup" v-for="(cmds, cmdGroup) in tabToCmds" :key="cmdGroup">
                             <div>
@@ -77,6 +77,7 @@ export class CmdBtnService {
                     // }
                     vueThis.tabToCmds = tabToCmds
                     vueThis.isTabVisible = vueThis.getIsVisible()
+                    vueThis.isUseSystemTheme = vueThis.getIsUseSystemTheme()
                     vueThis.cmds = vueThis.getCmds()
                 });
                 thisVar.config.changed$.subscribe(() => {
@@ -85,12 +86,14 @@ export class CmdBtnService {
                     vueThis.$refs.cmdTabs.selectTab("#"+Object.keys(tabToCmds)[0])
                     vueThis.tabToCmds = tabToCmds
                     vueThis.isTabVisible = vueThis.getIsVisible()
+                    vueThis.isUseSystemTheme = vueThis.getIsUseSystemTheme()
                     vueThis.cmds = vueThis.getCmds()
                     // console.log(vueThis.$refs.cmdTabs.selectTab)
                 })
                 return {
                     tabToCmds: this.updateCmds(),
                     isTabVisible: this.getIsVisible(),
+                    isUseSystemTheme: this.getIsUseSystemTheme(),
                     cmds: this.getCmds(),
                 }
             },
@@ -130,6 +133,15 @@ export class CmdBtnService {
                     }
                     console.log("returning: ", isTabVisible)
                     return isTabVisible
+                },
+                getIsUseSystemTheme() {
+                    var isUseSystemTheme = null
+                    console.log(thisVar.config.store)
+                    if (thisVar.config.store && thisVar.config.store.quickCmdBtnPlugin) {
+                        isUseSystemTheme = !thisVar.config.store.quickCmdBtnPlugin.useSystemTheme
+                    }
+                    console.log("returning: ", isUseSystemTheme)
+                    return isUseSystemTheme
                 },
                 getCmds() {
                     let cmds = []

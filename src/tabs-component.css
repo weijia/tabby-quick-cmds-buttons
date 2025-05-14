@@ -46,7 +46,8 @@
 
 @media (min-width: 50px) {
     .tabs-component-tab, .tabs-component-tab--custom {
-        background-color: var(--bs-body-bg);
+        background-color: #fff;
+        color: var(--theme-fg-more-2);
         border: solid 1px #ddd;
         border-radius: 3px 3px 0 0;
         margin-right: .5em;
@@ -63,7 +64,7 @@
 
 .tabs-component-tab-a, .tabs-component-tab-a--custom {
     align-items: center;
-    color: var(--theme-fg);
+    color: var(--theme-fg-more-2);
     display: flex;
     padding: .75em 1em;
     text-decoration: none;
@@ -75,7 +76,7 @@
 
 @media (min-width: 50px) {
     .tabs-component-panels {
-        background-color: var(--bs-body-bg);
+        background-color: #fff;
         border: solid 1px #ddd;
         border-radius: 0 6px 6px 6px;
         box-shadow: 0 0 10px rgba(0, 0, 0, .05);
@@ -118,3 +119,20 @@
     border-color: #7aa7c7;
     border-bottom: solid 1px #fff;
 }
+
+.use-fixed-theme .tabs-component-tab-a {
+    color: var(--theme-fg-more-2);
+}
+
+.use-fixed-theme .is-active {
+    color: var(--theme-fg);
+}
+
+.use-fixed-theme .tabs-component-panels {
+    background-color: var(--bs-body-bg);
+}
+
+.use-fixed-theme .tabs-component-tab {
+    background-color: var(--bs-body-bg);
+}
+
