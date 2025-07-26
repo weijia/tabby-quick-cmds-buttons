@@ -136,3 +136,62 @@
     background-color: var(--bs-body-bg);
 }
 
+/* 侧边栏样式 */
+.cmd-btn-sidebar {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    height: 100%;
+    overflow-y: auto;
+    transition: all 0.3s ease;
+}
+
+.cmd-btn-sidebar.collapsed {
+    width: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+.cmd-btn {
+    margin: 5px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.cmd-btn-toggle-sidebar {
+    position: absolute;
+    top: 10px;
+    left: 0;
+    width: 20px;
+    height: 40px;
+    background-color: var(--theme-bg-1);
+    color: var(--theme-fg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 5px 0 0 5px;
+    z-index: 100000;
+    font-size: 16px;
+    font-weight: bold;
+    border: 1px solid var(--theme-bg-3);
+    border-right: none;
+}
+
+/* 侧边栏模式下的标签样式调整 */
+.cmd-btn-sidebar .tabs-component {
+    margin: 0;
+    width: 100%;
+}
+
+.cmd-btn-sidebar .tabs-component-panels {
+    padding: 10px 0;
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+}
+
+.cmd-btn-sidebar .tabs-component-tab {
+    margin-bottom: 5px;
+}
+

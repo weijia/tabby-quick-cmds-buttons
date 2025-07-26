@@ -6,9 +6,12 @@ export class QuickCmdBtnConfigProvider extends ConfigProvider {
         quickCmdBtnPlugin: {
             disableTabs: false,
             useSystemTheme: false,
+            displayMode: 'floating', // 'floating' 或 'sidebar'
+            sidebarCollapsed: false,
         },
         hotkeys: {
             'toggle-tabs': [],
+            'toggle-sidebar-mode': [],
         },
     }
 }

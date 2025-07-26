@@ -2,22 +2,46 @@ h3 QuickCmdBtn
 
 .form-line
     .header
-        .title Disable tabs
-        .description Disable tabs for buttons
+        .title 显示模式
+        .description 选择按钮显示方式
+
+    select.form-control(
+        [(ngModel)]='config.store.quickCmdBtnPlugin.displayMode',
+        (ngModelChange)='config.save()'
+    )
+        option(value='floating') 浮动模式
+        option(value='sidebar') 侧边栏模式
+
+.form-line(*ngIf="config.store.quickCmdBtnPlugin.displayMode === 'sidebar'")
+    .header
+        .title 侧边栏默认折叠
+        .description 启动时侧边栏是否折叠
 
     toggle.ml-1(
-        title="Disable tabs for buttons",
+        title="侧边栏默认折叠",
+        [(ngModel)]='config.store.quickCmdBtnPlugin.sidebarCollapsed',
+        (ngModelChange)='config.save()'
+    )
+
+.form-line
+    .header
+        .title 禁用标签页
+        .description 禁用按钮的标签页分组
+
+    toggle.ml-1(
+        title="禁用标签页",
         [(ngModel)]='config.store.quickCmdBtnPlugin.disableTabs',
         (ngModelChange)='config.save()'
     )
 
 .form-line
     .header
-        .title Use system theme
-        .description Use system theme
+        .title 使用系统主题
+        .description 使用系统主题样式
 
     toggle.ml-1(
-        title="Use system theme",
+        title="使用系统主题",
         [(ngModel)]='config.store.quickCmdBtnPlugin.useSystemTheme',
         (ngModelChange)='config.save()'
     )
+

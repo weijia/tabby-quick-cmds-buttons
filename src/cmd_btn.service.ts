@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core'
-import { ConfigService } from 'tabby-core'
+import { ConfigService, HotkeysService } from 'tabby-core'
 import { createApp } from 'vue'
 // import { ref } from 'vue'
 import {Tabs, Tab} from 'vue3-tabs-component';
@@ -14,23 +14,30 @@ export class CmdBtnService {
 
     constructor (
         public config: ConfigService,
+        private hotkeys: HotkeysService,
     ) {
         const div = document.createElement('div')
-        div.setAttribute("style", 'position:absolute;top:500px;left:1000px;z-index:99999;height:0px')
         div.setAttribute("id", 'app-parent')
+        
+        // 根据显示模式设置不同的样式
+        this.updateAppParentStyle(div)
 
         div.innerHTML= `
             <div id="app">
-                <div v-show="isTabVisible===false" :class="{'use-fixed-theme': !isUseSystemTheme}">
-                    <button @click="sendCmd(cmd)" v-for="cmd in cmds" :key="cmd.name" style="margin:10px">
+                <div class="cmd-btn-toggle-sidebar" @click="toggleSidebar">
+                    <span v-if="isSidebarCollapsed">»</span>
+                    <span v-else>«</span>
+                </div>
+                <div v-show="isTabVisible===false" :class="{'use-fixed-theme': !isUseSystemTheme, 'cmd-btn-sidebar': true, 'collapsed': isSidebarCollapsed}">
+                    <button @click="sendCmd(cmd)" v-for="cmd in cmds" :key="cmd.name" class="cmd-btn">
                         {{ cmd.name }}
                     </button>
                 </div>
-                <div v-show="isTabVisible" :class="{'use-fixed-theme': !isUseSystemTheme}">
+                <div v-show="isTabVisible" :class="{'use-fixed-theme': !isUseSystemTheme, 'cmd-btn-sidebar': true, 'collapsed': isSidebarCollapsed}">
                     <tabs ref="cmdTabs" :options="{ useUrlFragment: false }" >
                         <tab v-bind:name="cmdGroup" v-for="(cmds, cmdGroup) in tabToCmds" :key="cmdGroup">
                             <div>
-                                <button @click="sendCmd(cmd)" v-for="cmd in cmds" :key="cmd.name" style="margin:10px">
+                                <button @click="sendCmd(cmd)" v-for="cmd in cmds" :key="cmd.name" class="cmd-btn">
                                     {{ cmd.name }}
                                 </button>
                             </div>
@@ -95,6 +102,8 @@ export class CmdBtnService {
                     isTabVisible: this.getIsVisible(),
                     isUseSystemTheme: this.getIsUseSystemTheme(),
                     cmds: this.getCmds(),
+                    isSidebarCollapsed: this.getIsSidebarCollapsed(),
+                    displayMode: this.getDisplayMode()
                 }
             },
             // computed: {
@@ -125,6 +134,15 @@ export class CmdBtnService {
                     // console.log("returning:", tabToCmds)
                     return tabToCmds
                 },
+                toggleSidebar() {
+                    this.isSidebarCollapsed = !this.isSidebarCollapsed;
+                    if (thisVar.config.store && thisVar.config.store.quickCmdBtnPlugin) {
+                        thisVar.config.store.quickCmdBtnPlugin.sidebarCollapsed = this.isSidebarCollapsed;
+                        thisVar.config.save();
+                    }
+                    // 更新父元素样式
+                    thisVar.updateAppParentStyle(document.getElementById('app-parent'));
+                },
                 getIsVisible() {
                     var isTabVisible = null
                     console.log(thisVar.config.store)
@@ -143,6 +161,20 @@ export class CmdBtnService {
                     console.log("returning: ", isUseSystemTheme)
                     return isUseSystemTheme
                 },
+                getIsSidebarCollapsed() {
+                    var isSidebarCollapsed = false
+                    if (thisVar.config.store && thisVar.config.store.quickCmdBtnPlugin) {
+                        isSidebarCollapsed = thisVar.config.store.quickCmdBtnPlugin.sidebarCollapsed || false
+                    }
+                    return isSidebarCollapsed
+                },
+                getDisplayMode() {
+                    var displayMode = 'floating'
+                    if (thisVar.config.store && thisVar.config.store.quickCmdBtnPlugin) {
+                        displayMode = thisVar.config.store.quickCmdBtnPlugin.displayMode || 'floating'
+                    }
+                    return displayMode
+                },
                 getCmds() {
                     let cmds = []
                     if(thisVar.config.store){
@@ -159,9 +191,18 @@ export class CmdBtnService {
         .component('tab', Tab)
         .mount('#app');
 
+        // 监听热键事件
+        this.hotkeys.matchedHotkey.subscribe(hotkey => {
+            if (hotkey === 'toggle-sidebar-mode') {
+                this.toggleDisplayMode();
+            }
+        });
 
-        // Make the DIV element draggable:
-        dragElement(document.getElementById("app-parent"));
+        // 根据显示模式决定是否启用拖动功能
+        if (this.getDisplayMode() === 'floating') {
+            // Make the DIV element draggable:
+            dragElement(document.getElementById("app-parent"));
+        }
 
         function dragElement(element) {
             let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
@@ -175,7 +216,7 @@ export class CmdBtnService {
 
             function dragMouseDown(e) {
                 // console.log(e);
-                if(e.target.id == "cmd-input") return;
+                if(e.target.id == "cmd-input" || e.target.classList.contains('cmd-btn-toggle-sidebar')) return;
                 e = e || window.event;
                 e.preventDefault();
                 // get the mouse cursor position at startup:
@@ -205,6 +246,65 @@ export class CmdBtnService {
                 document.onmousemove = null;
             }
         }
+    }
+
+    // 切换显示模式（浮动/侧边栏）
+    toggleDisplayMode() {
+        if (this.config.store && this.config.store.quickCmdBtnPlugin) {
+            const currentMode = this.config.store.quickCmdBtnPlugin.displayMode || 'floating';
+            this.config.store.quickCmdBtnPlugin.displayMode = currentMode === 'floating' ? 'sidebar' : 'floating';
+            this.config.save();
+            
+            // 更新元素样式
+            this.updateAppParentStyle(document.getElementById('app-parent'));
+            
+            // 如果切换到浮动模式，启用拖动功能
+            if (this.config.store.quickCmdBtnPlugin.displayMode === 'floating') {
+                // 重新加载页面以应用拖动功能
+                window.location.reload();
+            }
+        }
+    }
+
+    // 根据显示模式更新父元素样式
+    updateAppParentStyle(element) {
+        const displayMode = this.getDisplayMode();
+        const isSidebarCollapsed = this.getIsSidebarCollapsed();
+        
+        if (displayMode === 'sidebar') {
+            // 侧边栏模式
+            element.setAttribute("style", `
+                position: fixed;
+                top: 0;
+                right: 0;
+                bottom: 0;
+                z-index: 99999;
+                height: 100vh;
+                width: ${isSidebarCollapsed ? '40px' : '250px'};
+                transition: width 0.3s ease;
+                display: flex;
+                flex-direction: column;
+            `);
+        } else {
+            // 浮动模式
+            element.setAttribute("style", 'position:absolute;top:500px;left:1000px;z-index:99999;height:0px');
+        }
+    }
+
+    // 获取显示模式
+    getDisplayMode() {
+        if (this.config.store && this.config.store.quickCmdBtnPlugin) {
+            return this.config.store.quickCmdBtnPlugin.displayMode || 'floating';
+        }
+        return 'floating';
+    }
+
+    // 获取侧边栏是否折叠
+    getIsSidebarCollapsed() {
+        if (this.config.store && this.config.store.quickCmdBtnPlugin) {
+            return this.config.store.quickCmdBtnPlugin.sidebarCollapsed || false;
+        }
+        return false;
     }
 
     sendCmdToFocusTab(cmd) {

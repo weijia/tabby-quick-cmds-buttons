@@ -8,7 +8,11 @@ export class QuickCmdBtnHotkeyProvider extends HotkeyProvider {
         return [
             {
                 id: 'toggle-quick-cmd-btn',
-                name: 'Show/hide QuickCmdBtn',
+                name: '显示/隐藏快速命令按钮',
+            },
+            {
+                id: 'toggle-sidebar-mode',
+                name: '切换侧边栏模式',
             },
         ]
     }
