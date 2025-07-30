@@ -195,3 +195,99 @@
     margin-bottom: 5px;
 }
 
+/* 侧边栏模式下垂直排列标签 */
+.sidebar-mode .tabs-component-tabs {
+    flex-direction: column;
+    border-right: solid 1px #ddd;
+    border-bottom: none;
+    margin-right: 10px;
+    margin-bottom: 0;
+    padding-right: 5px;
+    min-width: 120px;
+    max-width: 150px;
+}
+
+.sidebar-mode .tabs-component {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+    margin: 0;
+}
+
+.sidebar-mode .tabs-component-tab {
+    margin-right: 0;
+    margin-bottom: 5px;
+    transform: none;
+}
+
+.sidebar-mode .tabs-component-tab.is-active {
+    border-bottom: solid 1px #ddd;
+    border-right: solid 1px #fff;
+}
+
+.sidebar-mode .tabs-component-panels {
+    flex: 1;
+    height: 100%;
+    max-height: calc(100vh - 50px);
+    overflow-y: auto;
+    padding: 0 10px;
+}
+
+.sidebar-mode.use-fixed-theme .tabs-component-tab.is-active {
+    border-right: solid 1px var(--bs-body-bg);
+}
+
+/* 侧边栏模式下按钮样式 */
+.sidebar-mode button {
+    display: block;
+    width: 100%;
+    text-align: left;
+    margin: 5px 0 !important;
+    padding: 8px 12px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    background-color: var(--bs-body-bg, #fff);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.sidebar-mode button:hover {
+    background-color: var(--bs-light, #f8f9fa);
+}
+
+.sidebar-mode.use-fixed-theme button.btn-primary {
+    background-color: var(--bs-primary, #0d6efd);
+    color: #fff;
+    border-color: var(--bs-primary, #0d6efd);
+}
+
+.sidebar-mode.use-fixed-theme button.btn-primary:hover {
+    background-color: var(--bs-primary-darker, #0b5ed7);
+}
+
+/* 侧边栏模式下折叠按钮样式 */
+.cmd-btn-toggle-sidebar.sidebar-mode {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    z-index: 100000;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--bs-body-bg, #fff);
+    border: 1px solid var(--bs-border-color, #ddd);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.cmd-btn-toggle-sidebar.sidebar-mode:hover {
+    background-color: var(--bs-light, #f8f9fa);
+}
+
+.cmd-btn-toggle-sidebar.sidebar-mode span {
+    font-size: 16px;
+    line-height: 1;
+}

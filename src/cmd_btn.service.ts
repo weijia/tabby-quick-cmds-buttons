@@ -24,7 +24,7 @@ export class CmdBtnService {
 
         div.innerHTML= `
             <div id="app">
-                <div class="cmd-btn-toggle-sidebar" @click="toggleSidebar">
+                <div class="cmd-btn-toggle-sidebar" @click="toggleSidebar" :class="{'sidebar-mode': displayMode === 'sidebar'}">
                     <span v-if="isSidebarCollapsed">»</span>
                     <span v-else>«</span>
                 </div>
@@ -33,7 +33,7 @@ export class CmdBtnService {
                         {{ cmd.name }}
                     </button>
                 </div>
-                <div v-show="isTabVisible" :class="{'use-fixed-theme': !isUseSystemTheme, 'cmd-btn-sidebar': true, 'collapsed': isSidebarCollapsed}, 'vertical-tab': isSidebarCollapsed">
+                <div v-show="isTabVisible" :class="{'use-fixed-theme': !isUseSystemTheme, 'cmd-btn-sidebar': true, 'collapsed': isSidebarCollapsed, 'sidebar-mode': displayMode === 'sidebar'}">
                     <tabs ref="cmdTabs" :options="{ useUrlFragment: false }" >
                         <tab v-bind:name="cmdGroup" v-for="(cmds, cmdGroup) in tabToCmds" :key="cmdGroup">
                             <div>
@@ -280,10 +280,12 @@ export class CmdBtnService {
                 bottom: 0;
                 z-index: 99999;
                 height: 100vh;
-                width: ${isSidebarCollapsed ? '40px' : '250px'};
+                width: ${isSidebarCollapsed ? '40px' : '300px'};
                 transition: width 0.3s ease;
                 display: flex;
                 flex-direction: column;
+                background-color: var(--bs-body-bg, #fff);
+                border-left: 1px solid var(--bs-border-color, #ddd);
             `);
         } else {
             // 浮动模式
