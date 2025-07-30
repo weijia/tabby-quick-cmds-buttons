@@ -30,7 +30,7 @@ export class CmdBtnService {
                     <tabs ref="cmdTabs" :options="{ useUrlFragment: false }" >
                         <tab v-bind:name="cmdGroup" v-for="(cmds, cmdGroup) in tabToCmds" :key="cmdGroup">
                             <div>
-                                <button @click="sendCmd(cmd)" v-for="cmd in cmds" :key="cmd.name" style="margin:10px">
+                                <button @click="sendCmd(cmd)" v-for="cmd in cmds" :key="cmd.name" style="margin:10px" :class="{'btn-primary': !isUseSystemTheme, 'btn': !isUseSystemTheme}">
                                     {{ cmd.name }}
                                 </button>
                             </div>
