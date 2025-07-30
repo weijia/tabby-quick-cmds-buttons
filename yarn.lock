@@ -875,13 +875,6 @@ clean-stack@^2.0.0:
   resolved "https://registry.yarnpkg.com/clean-stack/-/clean-stack-2.2.0.tgz#ee8472dbb129e727b31e8a10a427dee9dfe4008b"
   integrity sha512-4diC9HaTE+KRAMWhDhrGOECgWZxoevMc5TlkObMqNSsVU62PYzXZ/SMTjzyGAFF1YusgxGcSWTEXBhp0CPwQ1A==
 
-clippyjs@^0.0.3:
-  version "0.0.3"
-  resolved "https://registry.npmmirror.com/clippyjs/-/clippyjs-0.0.3.tgz#34c45e3416b74d3773aeb37296c618a0b658fbbb"
-  integrity sha512-i4sPaKbCA6PfXiwxNK35E1io6AXN7VGwEGZR9sE8RqOgXPNtRWKbFubmx87JwSuwIrdClO/rkTMjhl2ZyOHjug==
-  dependencies:
-    jquery "^3.2.1"
-
 cliui@^2.1.0:
   version "2.1.0"
   resolved "https://registry.npmmirror.com/cliui/-/cliui-2.1.0.tgz#4b475760ff80264c762c3a1719032e91c7fea0d1"
@@ -1789,11 +1782,6 @@ jest-worker@^27.4.5:
     "@types/node" "*"
     merge-stream "^2.0.0"
     supports-color "^8.0.0"
-
-jquery@^3.2.1:
-  version "3.7.0"
-  resolved "https://registry.npmmirror.com/jquery/-/jquery-3.7.0.tgz#fe2c01a05da500709006d8790fe21c8a39d75612"
-  integrity sha512-umpJ0/k8X0MvD1ds0P9SfowREz2LenHsQaxSohMZ5OMNEU2r0tf8pdeEFTHMFxWVxKNyU9rTtK3CWzUCTKJUeQ==
 
 js-base64@^2.4.9:
   version "2.6.4"

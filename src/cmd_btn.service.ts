@@ -29,15 +29,15 @@ export class CmdBtnService {
                     <span v-else>«</span>
                 </div>
                 <div v-show="isTabVisible===false" :class="{'use-fixed-theme': !isUseSystemTheme, 'cmd-btn-sidebar': true, 'collapsed': isSidebarCollapsed}">
-                    <button @click="sendCmd(cmd)" v-for="cmd in cmds" :key="cmd.name" class="cmd-btn">
+                    <button @click="sendCmd(cmd)" v-for="cmd in cmds" :key="cmd.name" class="cmd-btn" style="margin:10px">
                         {{ cmd.name }}
                     </button>
                 </div>
-                <div v-show="isTabVisible" :class="{'use-fixed-theme': !isUseSystemTheme, 'cmd-btn-sidebar': true, 'collapsed': isSidebarCollapsed}">
+                <div v-show="isTabVisible" :class="{'use-fixed-theme': !isUseSystemTheme, 'cmd-btn-sidebar': true, 'collapsed': isSidebarCollapsed}, 'vertical-tab': isSidebarCollapsed">
                     <tabs ref="cmdTabs" :options="{ useUrlFragment: false }" >
                         <tab v-bind:name="cmdGroup" v-for="(cmds, cmdGroup) in tabToCmds" :key="cmdGroup">
                             <div>
-                                <button @click="sendCmd(cmd)" v-for="cmd in cmds" :key="cmd.name" class="cmd-btn">
+                                <button @click="sendCmd(cmd)" v-for="cmd in cmds" :key="cmd.name" style="margin:10px" :class="{'btn-primary': !isUseSystemTheme, 'btn': !isUseSystemTheme}">
                                     {{ cmd.name }}
                                 </button>
                             </div>
