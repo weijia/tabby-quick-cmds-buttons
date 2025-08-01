@@ -298,6 +298,7 @@
     flex-direction: column;
     height: 100%;
     width: 300px;
+    padding-top: 38px; /* 为窗口控制栏预留空间 */
     min-width: 200px;
     max-width: 500px;
     border-left: 1px solid var(--bs-border-color, #ddd);
