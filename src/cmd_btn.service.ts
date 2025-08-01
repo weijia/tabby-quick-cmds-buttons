@@ -549,6 +549,16 @@ export class CmdBtnService {
             if (this.config.store && this.config.store.quickCmdBtnPlugin) {
                 this.config.save();
             }
+            
+            // 拖动结束后，确保 terminalElement 和 tab-body 的大小正确
+            const newSidebarWidth = parseInt(getComputedStyle(sidebarElement).width, 10);
+            terminalElement.style.width = `calc(100% - ${newSidebarWidth}px)`;
+            
+            // 调整 terminalElement 内部的 tab-body 宽度
+            const tabBody = terminalElement.querySelector('.content-tab');
+            if (tabBody) {
+                tabBody.style.width = `calc(100% - ${newSidebarWidth}px)`;
+            }
         };
         
         resizer.addEventListener('mousedown', startDrag);
