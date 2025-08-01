@@ -12,5 +12,9 @@
     "**/.factorypath": true
   },
   "hide-files.files": [],
-  "cSpell.words": ["cmds", "primevue"]
+  "cSpell.words": [
+    "cmds",
+    "primevue",
+    "Resizer"
+  ]
 }

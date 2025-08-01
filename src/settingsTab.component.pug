@@ -9,8 +9,7 @@ h3 QuickCmdBtn
         [(ngModel)]='config.store.quickCmdBtnPlugin.displayMode',
         (ngModelChange)='config.save()'
     )
-        option(value='floating') 浮动模式
-        option(value='sidebar') 侧边栏模式
+        option(*ngFor='let mode of displayModes', [value]='mode.id') {{mode.name}}
 
 .form-line(*ngIf="config.store.quickCmdBtnPlugin.displayMode === 'sidebar'")
     .header
@@ -44,4 +43,3 @@ h3 QuickCmdBtn
         [(ngModel)]='config.store.quickCmdBtnPlugin.useSystemTheme',
         (ngModelChange)='config.save()'
     )
-

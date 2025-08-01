@@ -291,3 +291,142 @@
     font-size: 16px;
     line-height: 1;
 }
+
+/* Dock模式样式 */
+.dock-mode {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 300px;
+    min-width: 200px;
+    max-width: 500px;
+    border-left: 1px solid var(--bs-border-color, #ddd);
+    background-color: var(--bs-body-bg, #fff);
+    position: relative;
+    transition: width 0.3s ease;
+}
+
+/* 可拖动分隔条样式 */
+#cmd-btn-resizer {
+    width: 5px;
+    height: 100%;
+    background-color: var(--bs-border-color, #ddd);
+    cursor: col-resize;
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 100;
+    transition: background-color 0.2s ease;
+}
+
+#cmd-btn-resizer:hover,
+#cmd-btn-resizer:active {
+    background-color: var(--bs-primary, #0d6efd);
+}
+
+.dock-mode .tabs-component {
+    display: flex;
+    flex-direction: row; /* 改为水平布局 */
+    height: 100%;
+}
+
+.dock-mode .tabs-component-tabs {
+    display: flex;
+    flex-direction: column;
+    padding-left: 0;
+    margin-bottom: 0;
+    border-bottom: none;
+    border-right: solid 1px var(--bs-border-color, #ddd);
+    width: 120px; /* 固定宽度 */
+    min-width: 100px;
+    max-width: 150px;
+    overflow-y: auto;
+    height: 100%; /* 占满整个高度 */
+    max-height: none; /* 移除最大高度限制 */
+}
+
+.dock-mode .tabs-component-tab {
+    color: var(--bs-body-color, #212529);
+    font-size: 14px;
+    font-weight: 600;
+    margin-right: 0;
+    list-style: none;
+    border: solid 1px var(--bs-border-color, #ddd);
+    border-bottom: none;
+    border-radius: 0;
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+.dock-mode .tabs-component-tab:last-child {
+    border-bottom: solid 1px var(--bs-border-color, #ddd);
+}
+
+.dock-mode .tabs-component-tab.is-active {
+    color: var(--bs-primary, #0d6efd);
+    border-right: solid 1px var(--bs-body-bg, #fff);
+}
+
+.dock-mode .tabs-component-panels {
+    flex: 1;
+    height: 100%;
+    overflow-y: auto;
+    padding: 0 10px;
+    display: flex;
+    flex-direction: column;
+}
+
+.dock-mode button {
+    display: block;
+    width: 100%;
+    text-align: left;
+    margin: 5px 0 !important;
+    padding: 8px 12px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    background-color: var(--bs-body-bg, #fff);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.dock-mode button:hover {
+    background-color: var(--bs-light, #f8f9fa);
+}
+
+.dock-mode.use-fixed-theme button.btn-primary {
+    background-color: var(--bs-primary, #0d6efd);
+    color: #fff;
+    border-color: var(--bs-primary, #0d6efd);
+}
+
+.dock-mode.use-fixed-theme button.btn-primary:hover {
+    background-color: var(--bs-primary-darker, #0b5ed7);
+}
+
+/* Dock模式下折叠按钮样式 */
+.cmd-btn-toggle-sidebar.dock-mode {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    z-index: 100000;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--bs-body-bg, #fff);
+    border: 1px solid var(--bs-border-color, #ddd);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.cmd-btn-toggle-sidebar.dock-mode:hover {
+    background-color: var(--bs-light, #f8f9fa);
+}
+
+.cmd-btn-toggle-sidebar.dock-mode span {
+    font-size: 14px;
+    line-height: 1;
+}

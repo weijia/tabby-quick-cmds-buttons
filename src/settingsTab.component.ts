@@ -9,6 +9,7 @@ export class QuickCmdBtnSettingsTabComponent {
     displayModes = [
         { id: 'floating', name: '浮动模式' },
         { id: 'sidebar', name: '侧边栏模式' },
+        { id: 'dock', name: '终端内嵌模式' },
     ]
 
     constructor (
