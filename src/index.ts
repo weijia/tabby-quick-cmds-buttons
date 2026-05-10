@@ -25,9 +25,6 @@ import { QuickCmdBtnContextMenuProvider } from './contextMenu'
         { provide: SettingsTabProvider, useClass: QuickCmdBtnSettingsTabProvider, multi: true },
         { provide: TerminalDecorator, useClass: QuickCmdBtnDecorator, multi: true },
     ],
-    entryComponents: [
-        QuickCmdBtnSettingsTabComponent,
-    ],
     declarations: [
         QuickCmdBtnSettingsTabComponent,
     ],

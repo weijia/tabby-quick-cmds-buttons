@@ -11,26 +11,32 @@ import 'tabs-component.css';
 @Injectable({ providedIn: 'root'})
 export class CmdBtnService {
     public  tabs = []
+    private app: any = null
+    private div: HTMLElement | null = null
+    private subscriptions: any[] = []
 
     constructor (
         public config: ConfigService,
     ) {
+        // Clean up any previous instance
+        this.cleanup()
+
         const div = document.createElement('div')
-        div.setAttribute("style", 'position:absolute;top:500px;left:1000px;z-index:99999;height:0px')
+        div.setAttribute("style", 'position:absolute;top:40px;right:10px;z-index:99999;max-height:70vh;min-height:40px;min-width:600px;overflow-y:auto;overflow-x:hidden;flex-shrink:0;-webkit-app-region:no-drag;transform:translateZ(0);')
         div.setAttribute("id", 'app-parent')
 
         div.innerHTML= `
             <div id="app">
-                <div v-show="isTabVisible===false" :class="{'use-fixed-theme': !isUseSystemTheme}">
-                    <button @click="sendCmd(cmd)" v-for="cmd in cmds" :key="cmd.name" style="margin:10px">
+                <div v-show="isTabVisible===false" :class="{'use-fixed-theme': !isUseSystemTheme}" style="display:flex;flex-wrap:wrap">
+                    <button @click="sendCmd(cmd)" v-for="cmd in cmds" :key="cmd.name" :title="cmd.description || cmd.text || ''" style="margin:4px">
                         {{ cmd.name }}
                     </button>
                 </div>
                 <div v-show="isTabVisible" :class="{'use-fixed-theme': !isUseSystemTheme}">
                     <tabs ref="cmdTabs" :options="{ useUrlFragment: false }" >
                         <tab v-bind:name="cmdGroup" v-for="(cmds, cmdGroup) in tabToCmds" :key="cmdGroup">
-                            <div>
-                                <button @click="sendCmd(cmd)" v-for="cmd in cmds" :key="cmd.name" style="margin:10px">
+                            <div style="display:flex;flex-wrap:wrap">
+                                <button @click="sendCmd(cmd)" v-for="cmd in cmds" :key="cmd.name" :title="cmd.description || cmd.text || ''" style="margin:4px">
                                     {{ cmd.name }}
                                 </button>
                             </div>
@@ -41,55 +47,38 @@ export class CmdBtnService {
         `
 
         document.querySelector('body').appendChild(div)
+        this.div = div
 
         let thisVar = this
-        
-        const app = createApp({
+
+        this.app = createApp({
             mounted: function(){
-                console.log("====================mounted", this, "#"+Object.keys(this.tabToCmds)[0])
-                this.$refs.cmdTabs.selectTab("#"+Object.keys(this.tabToCmds)[0])
+                if (this.$refs.cmdTabs && Object.keys(this.tabToCmds).length > 0) {
+                    this.$refs.cmdTabs.selectTab("#"+Object.keys(this.tabToCmds)[0])
+                }
             },
             data() {
                 // const cmdTabs = ref(null)
                 // This function will be called only once.
                 let vueThis = this
-                console.log("---------------------------------data called", vueThis)
-                console.log("---------------------------------", thisVar)
-                thisVar.config.ready$.subscribe(()=>{
-                    console.log("---------------------------------config.ready", 
-                        thisVar, thisVar.config, thisVar.config.store,
-                        vueThis, vueThis.$refs.cmdTabs)
-                    // if(vueThis.$refs.cmdTabs.value) {
-                    //     console.log(vueThis.$refs.cmdTabs.value,
-                    //         vueThis.$refs.cmdTabs.value.selectTab("helm"))
-                    // }
+                const updateUI = () => {
                     const tabToCmds = vueThis.updateCmds();
-                    // if(vueThis.$refs && vueThis.$refs.cmdTabs) {
-                        // const firstGroup = "#"+Object.keys(tabToCmds)[0]
-                        // console.log(vueThis.$refs.cmdTabs.selectTab, firstGroup)
-                        // vueThis.$refs.cmdTabs.selectTab(firstGroup)
-                        setTimeout(() => {
-                            console.log("next tick:", vueThis.$refs)
-                            const firstGroup = "#"+Object.keys(tabToCmds)[0]
-                            console.log(vueThis.$refs.cmdTabs.selectTab, firstGroup)
-                            vueThis.$refs.cmdTabs.selectTab(firstGroup)
-                        }, 3000);
-                    // }
+                    if (vueThis.$refs && vueThis.$refs.cmdTabs && Object.keys(tabToCmds).length > 0) {
+                        vueThis.$refs.cmdTabs.selectTab("#" + Object.keys(tabToCmds)[0])
+                    }
                     vueThis.tabToCmds = tabToCmds
                     vueThis.isTabVisible = vueThis.getIsVisible()
                     vueThis.isUseSystemTheme = vueThis.getIsUseSystemTheme()
                     vueThis.cmds = vueThis.getCmds()
+                }
+
+                const sub1 = thisVar.config.ready$.subscribe(() => {
+                    updateUI()
                 });
-                thisVar.config.changed$.subscribe(() => {
-                    console.log('==================config changed', vueThis)
-                    const tabToCmds = vueThis.updateCmds();
-                    vueThis.$refs.cmdTabs.selectTab("#"+Object.keys(tabToCmds)[0])
-                    vueThis.tabToCmds = tabToCmds
-                    vueThis.isTabVisible = vueThis.getIsVisible()
-                    vueThis.isUseSystemTheme = vueThis.getIsUseSystemTheme()
-                    vueThis.cmds = vueThis.getCmds()
-                    // console.log(vueThis.$refs.cmdTabs.selectTab)
+                const sub2 = thisVar.config.changed$.subscribe(() => {
+                    updateUI()
                 })
+                thisVar.subscriptions.push(sub1, sub2)
                 return {
                     tabToCmds: this.updateCmds(),
                     isTabVisible: this.getIsVisible(),
@@ -127,20 +116,16 @@ export class CmdBtnService {
                 },
                 getIsVisible() {
                     var isTabVisible = null
-                    console.log(thisVar.config.store)
                     if (thisVar.config.store && thisVar.config.store.quickCmdBtnPlugin) {
                         isTabVisible = !thisVar.config.store.quickCmdBtnPlugin.disableTabs
                     }
-                    console.log("returning: ", isTabVisible)
                     return isTabVisible
                 },
                 getIsUseSystemTheme() {
                     var isUseSystemTheme = null
-                    console.log(thisVar.config.store)
                     if (thisVar.config.store && thisVar.config.store.quickCmdBtnPlugin) {
                         isUseSystemTheme = !thisVar.config.store.quickCmdBtnPlugin.useSystemTheme
                     }
-                    console.log("returning: ", isUseSystemTheme)
                     return isUseSystemTheme
                 },
                 getCmds() {
@@ -154,8 +139,8 @@ export class CmdBtnService {
                 }
             }
         })
-        app.use(PrimeVue);
-        app.component('tabs', Tabs)
+        this.app.use(PrimeVue);
+        this.app.component('tabs', Tabs)
         .component('tab', Tab)
         .mount('#app');
 
@@ -174,8 +159,14 @@ export class CmdBtnService {
             }
 
             function dragMouseDown(e) {
-                // console.log(e);
-                if(e.target.id == "cmd-input") return;
+                // Only allow dragging from empty areas, not buttons/tabs/inputs
+                if(e.target.tagName === "BUTTON" || e.target.tagName === "A" || e.target.id === "cmd-input") {
+                    return;
+                }
+                // Check if click is inside a tab or tab-related element
+                if(e.target.closest('.tabs-component-tab') || e.target.closest('.tabs-component-panels')) {
+                    return;
+                }
                 e = e || window.event;
                 e.preventDefault();
                 // get the mouse cursor position at startup:
@@ -194,9 +185,16 @@ export class CmdBtnService {
                 pos2 = pos4 - e.clientY;
                 pos3 = e.clientX;
                 pos4 = e.clientY;
-                // set the element's new position:
-                element.style.top = (element.offsetTop - pos2) + "px";
-                element.style.left = (element.offsetLeft - pos1) + "px";
+                // clamp position so panel stays within viewport
+                let newTop = element.offsetTop - pos2;
+                let newLeft = element.offsetLeft - pos1;
+                const maxTop = window.innerHeight - 40;
+                const maxLeft = window.innerWidth - 80;
+                newTop = Math.max(0, Math.min(newTop, maxTop));
+                newLeft = Math.max(-(element.offsetWidth - 80), Math.min(newLeft, maxLeft));
+                element.style.top = newTop + "px";
+                element.style.left = newLeft + "px";
+                element.style.right = "auto";
             }
 
             function closeDragElement() {
@@ -218,5 +216,28 @@ export class CmdBtnService {
     addTab (tab: any) {
         // console.log("adding tab")
         this.tabs.push(tab)
+    }
+
+    private cleanup() {
+        // Unsubscribe from all stored subscriptions
+        for (const subscription of this.subscriptions) {
+            subscription.unsubscribe()
+        }
+        this.subscriptions = []
+
+        // Destroy Vue app instance if it exists
+        if (this.app) {
+            this.app.unmount()
+            this.app = null
+        }
+
+        // Remove DOM element if it exists
+        if (this.div && this.div.parentNode) {
+            this.div.parentNode.removeChild(this.div)
+            this.div = null
+        }
+
+        // Clear tabs array
+        this.tabs = []
     }
 }
