@@ -27,21 +27,71 @@ export class CmdBtnService {
 
         div.innerHTML= `
             <div id="app">
-                <div v-show="isTabVisible===false" :class="{'use-fixed-theme': !isUseSystemTheme}" style="display:flex;flex-wrap:wrap">
-                    <button @click="sendCmd(cmd)" v-for="cmd in cmds" :key="cmd.name" :title="cmd.description || cmd.text || ''" style="margin:4px">
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:8px;border-bottom:1px solid #ccc;background:#f5f5f5;" id="app-parent-header">
+                    <span style="font-weight:bold;font-size:12px;">Quick Commands</span>
+                    <div style="display:flex;gap:4px;">
+                        <button @click="showCreateCommandDialog" style="padding:4px 8px;font-size:12px;cursor:pointer;" title="Add new command">+</button>
+                        <button @click="showSettings" style="padding:4px 8px;font-size:12px;cursor:pointer;" title="Settings">⚙️</button>
+                    </div>
+                </div>
+                <div v-show="isTabVisible===false" :class="{'use-fixed-theme': !isUseSystemTheme}" style="display:flex;flex-wrap:wrap;padding:8px;">
+                    <button @click="sendCmd(cmd)" @contextmenu="openCmdContextMenu($event, cmd)" v-for="cmd in cmds" :key="cmd.name" :title="cmd.description || cmd.text || ''" style="margin:4px">
                         {{ cmd.name }}
                     </button>
                 </div>
                 <div v-show="isTabVisible" :class="{'use-fixed-theme': !isUseSystemTheme}">
                     <tabs ref="cmdTabs" :options="{ useUrlFragment: false }" >
                         <tab v-bind:name="cmdGroup" v-for="(cmds, cmdGroup) in tabToCmds" :key="cmdGroup">
-                            <div style="display:flex;flex-wrap:wrap">
-                                <button @click="sendCmd(cmd)" v-for="cmd in cmds" :key="cmd.name" :title="cmd.description || cmd.text || ''" style="margin:4px">
+                            <div style="display:flex;flex-wrap:wrap;padding:8px;">
+                                <button @click="sendCmd(cmd)" @contextmenu="openCmdContextMenu($event, cmd)" v-for="cmd in cmds" :key="cmd.name" :title="cmd.description || cmd.text || ''" style="margin:4px">
                                     {{ cmd.name }}
                                 </button>
                             </div>
                         </tab>
                     </tabs>
+                </div>
+
+                <!-- Create Command Dialog -->
+                <div v-if="showDialog" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);display:flex;justify-content:center;align-items:center;z-index:100000;" @click="closeDialog">
+                    <div style="background:white;padding:20px;border-radius:8px;min-width:400px;box-shadow:0 2px 10px rgba(0,0,0,0.1);" @click.stop>
+                        <h3 style="margin-top:0;margin-bottom:16px;">Create New Command</h3>
+                        <div style="margin-bottom:12px;">
+                            <label style="display:block;margin-bottom:4px;font-weight:bold;font-size:12px;">Command Name</label>
+                            <input v-model="newCmd.name" type="text" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;box-sizing:border-box;" placeholder="e.g., List Files" />
+                        </div>
+                        <div style="margin-bottom:12px;">
+                            <label style="display:block;margin-bottom:4px;font-weight:bold;font-size:12px;">Command Text</label>
+                            <textarea v-model="newCmd.text" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;box-sizing:border-box;font-family:monospace;height:80px;" placeholder="e.g., ls -la" />
+                        </div>
+                        <div style="margin-bottom:12px;">
+                            <label style="display:block;margin-bottom:4px;font-weight:bold;font-size:12px;">Description</label>
+                            <input v-model="newCmd.description" type="text" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;box-sizing:border-box;" placeholder="What does this command do?" />
+                        </div>
+                        <div style="margin-bottom:12px;">
+                            <label style="display:block;margin-bottom:4px;font-weight:bold;font-size:12px;">Group/Tab</label>
+                            <input v-model="newCmd.group" type="text" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;box-sizing:border-box;" placeholder="e.g., System" />
+                        </div>
+                        <div style="margin-bottom:16px;">
+                            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                                <input v-model="newCmd.appendCR" type="checkbox" />
+                                <span style="font-size:12px;">Append newline (Enter)</span>
+                            </label>
+                        </div>
+                        <div style="display:flex;gap:8px;justify-content:flex-end;">
+                            <button @click="closeDialog" style="padding:8px 16px;background:#f0f0f0;border:1px solid #ccc;border-radius:4px;cursor:pointer;">Cancel</button>
+                            <button @click="saveCommand" style="padding:8px 16px;background:#4CAF50;color:white;border:none;border-radius:4px;cursor:pointer;">Save Command</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Context Menu -->
+                <div v-if="showContextMenu" :style="{position:'fixed',top:contextMenuY+'px',left:contextMenuX+'px',background:'white',border:'1px solid #ccc',border-radius:'4px',box-shadow:'0 2px 8px rgba(0,0,0,0.15)',z-index:'100001'}" @mouseleave="showContextMenu = false">
+                    <div @click="editCommand(contextMenuCmd)" style="padding:8px 16px;cursor:pointer;font-size:12px;user-select:none;" class="context-menu-item">
+                        Edit
+                    </div>
+                    <div @click="deleteCommand(contextMenuCmd)" style="padding:8px 16px;cursor:pointer;font-size:12px;color:#f44336;user-select:none;" class="context-menu-item">
+                        Delete
+                    </div>
                 </div>
             </div>
         `
@@ -84,6 +134,18 @@ export class CmdBtnService {
                     isTabVisible: this.getIsVisible(),
                     isUseSystemTheme: this.getIsUseSystemTheme(),
                     cmds: this.getCmds(),
+                    showDialog: false,
+                    showContextMenu: false,
+                    contextMenuX: 0,
+                    contextMenuY: 0,
+                    contextMenuCmd: null,
+                    newCmd: {
+                        name: '',
+                        text: '',
+                        description: '',
+                        group: 'default',
+                        appendCR: true,
+                    },
                 }
             },
             // computed: {
@@ -94,24 +156,93 @@ export class CmdBtnService {
             // },
             methods: {
                 sendCmd(cmd) {
-                    // thisVar.tab.sendInput(cmd.text + (cmd.appendCR ? "\n" : ""))
-                    // console.log(cmd, thisVar.tabs)
                     thisVar.sendCmdToFocusTab(cmd)
+                },
+                showCreateCommandDialog() {
+                    this.newCmd = {
+                        name: '',
+                        text: '',
+                        description: '',
+                        group: 'default',
+                        appendCR: true,
+                    }
+                    this.showDialog = true
+                    this.showContextMenu = false
+                },
+                closeDialog() {
+                    this.showDialog = false
+                },
+                saveCommand() {
+                    if (!this.newCmd.name || !this.newCmd.text) {
+                        alert('Name and command text are required')
+                        return
+                    }
+                    // Add command to config store
+                    if (!thisVar.config.store.qc.cmds) {
+                        thisVar.config.store.qc.cmds = []
+                    }
+                    // Check if editing existing command
+                    const existingIndex = thisVar.config.store.qc.cmds.findIndex(c => c.name === this.newCmd.name)
+                    if (existingIndex >= 0) {
+                        // Update existing
+                        thisVar.config.store.qc.cmds[existingIndex] = {
+                            name: this.newCmd.name,
+                            text: this.newCmd.text,
+                            description: this.newCmd.description || '',
+                            group: this.newCmd.group || 'default',
+                            appendCR: this.newCmd.appendCR,
+                        }
+                    } else {
+                        // Add new
+                        thisVar.config.store.qc.cmds.push({
+                            name: this.newCmd.name,
+                            text: this.newCmd.text,
+                            description: this.newCmd.description || '',
+                            group: this.newCmd.group || 'default',
+                            appendCR: this.newCmd.appendCR,
+                        })
+                    }
+                    // Persist changes - this will trigger config.changed$ subscription
+                    thisVar.config.save()
+                    this.closeDialog()
+                },
+                openCmdContextMenu(event, cmd) {
+                    event.preventDefault()
+                    this.contextMenuX = event.clientX
+                    this.contextMenuY = event.clientY
+                    this.contextMenuCmd = cmd
+                    this.showContextMenu = true
+                },
+                editCommand(cmd) {
+                    this.newCmd = { ...cmd }
+                    this.showContextMenu = false
+                    this.showDialog = true
+                },
+                deleteCommand(cmd) {
+                    if (confirm('Delete command: ' + cmd.name + '?')) {
+                        const index = thisVar.config.store.qc.cmds.findIndex(c => c.name === cmd.name)
+                        if (index >= 0) {
+                            thisVar.config.store.qc.cmds.splice(index, 1)
+                            // Persist changes - this will trigger config.changed$ subscription
+                            thisVar.config.save()
+                        }
+                    }
+                    this.showContextMenu = false
+                },
+                showSettings() {
+                    // Placeholder for settings - could open settings tab or dialog
+                    console.log('Settings clicked')
                 },
                 updateCmds() {
                     const tabToCmds: { [key: string]: any } = {};
                     if(thisVar.config.store){
                         for (let element of thisVar.config.store.qc.cmds) {
-                            // console.log(element)
                             if (!tabToCmds.hasOwnProperty(element.group)) {
                                 tabToCmds[element.group] = []
-                                // console.log(JSON.stringify(tabToCmds))
                             }
                             tabToCmds[element.group].push(element)
-                            // console.log(JSON.stringify(tabToCmds))
                         }
                     }
-                    // console.log("returning:", tabToCmds)
                     return tabToCmds
                 },
                 getIsVisible() {
@@ -165,6 +296,10 @@ export class CmdBtnService {
                 }
                 // Check if click is inside a tab or tab-related element
                 if(e.target.closest('.tabs-component-tab') || e.target.closest('.tabs-component-panels')) {
+                    return;
+                }
+                // Don't drag from header
+                if(e.target.closest('#app-parent-header')) {
                     return;
                 }
                 e = e || window.event;
