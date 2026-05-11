@@ -4,7 +4,7 @@
 
 ## For the Tabby terminal
 
-![Screenshot](./screenshot.png)
+![Screenshot](./test/screenshot-medium-1280x720.png)
 
 This plugin create buttons for quick commands, based on Eugene Pankov's tabby-clippy
 Codes:
