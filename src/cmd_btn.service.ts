@@ -20,30 +20,63 @@ export class CmdBtnService {
     ) {
         // Clean up any previous instance
         this.cleanup()
+        console.log('✓ CmdBtnService loaded with quick-add feature (v1.1.1)')
+
+        // Unique marker to verify THIS version is loaded
+        const markerEl = document.createElement('div')
+        markerEl.id = 'PLUGIN_VERSION_MARKER_20250510_184500_TYPING_FIX'
+        markerEl.style.display = 'none'
+        document.body.appendChild(markerEl)
 
         const div = document.createElement('div')
-        div.setAttribute("style", 'position:absolute;top:40px;right:10px;z-index:99999;max-height:70vh;min-height:40px;min-width:600px;overflow-y:auto;overflow-x:hidden;flex-shrink:0;-webkit-app-region:no-drag;transform:translateZ(0);')
+        div.setAttribute("style", 'position:absolute;top:40px;right:10px;z-index:99999;max-height:70vh;min-height:40px;width:650px;overflow-y:auto;overflow-x:hidden;flex-shrink:0;-webkit-app-region:no-drag;')
         div.setAttribute("id", 'app-parent')
+        console.log('✓ Created #app-parent div')
 
-        div.innerHTML= `
-            <div id="app">
-                <div style="display:flex;justify-content:space-between;align-items:center;padding:8px;border-bottom:1px solid #ccc;background:#f5f5f5;" id="app-parent-header">
-                    <span style="font-weight:bold;font-size:12px;">Quick Commands</span>
-                    <div style="display:flex;gap:4px;">
-                        <button @click="showCreateCommandDialog" style="padding:4px 8px;font-size:12px;cursor:pointer;" title="Add new command">+</button>
-                        <button @click="showSettings" style="padding:4px 8px;font-size:12px;cursor:pointer;" title="Settings">⚙️</button>
+        // Create header separately outside of Vue
+        const header = document.createElement('div')
+        header.setAttribute("id", 'app-parent-header')
+        header.setAttribute("style", 'background:#f5f5f5;padding:8px;border-bottom:1px solid #ccc;')
+        header.textContent = "Quick Commands Header"
+        console.log('✓ Created header element')
+
+        const appDiv = document.createElement('div')
+        appDiv.setAttribute("id", 'app')
+        appDiv.style.height = '100%'
+        appDiv.style.width = '100%'
+        appDiv.style.display = 'flex'
+        appDiv.style.flexDirection = 'column'
+        div.appendChild(appDiv)
+        div.style.width = '650px'
+        div.style.height = 'auto'
+        div.style.minHeight = '80px'
+        document.querySelector('body').appendChild(div)
+
+        const templateHTML = `
+            <div style="display:flex;flex-direction:column;height:100%;width:100%;">
+                <!-- Header Section -->
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:8px;background:#f5f5f5;border-bottom:1px solid #ddd;flex-shrink:0;">
+                    <span style="font-weight:bold;font-size:14px;">Quick Commands</span>
+                    <div style="display:flex;gap:4px;align-items:center;">
+                        <label title="When checked, commands are typed into the terminal without pressing Enter, so you can edit them first" style="display:flex;align-items:center;gap:3px;cursor:pointer;font-size:11px;color:#666;white-space:nowrap;">
+                            <input type="checkbox" v-model="editBeforeSend" />
+                            Edit first
+                        </label>
+                        <button @click="showCreateCommandDialog" title="Add a new quick command" style="padding:4px 8px;background:#4CAF50;color:white;border:none;border-radius:3px;cursor:pointer;font-weight:bold;">+ Add Command</button>
+                        <button @click="closePanel" style="padding:4px 8px;background:#f0f0f0;border:1px solid #ccc;border-radius:3px;cursor:pointer;">✕</button>
                     </div>
                 </div>
-                <div v-show="isTabVisible===false" :class="{'use-fixed-theme': !isUseSystemTheme}" style="display:flex;flex-wrap:wrap;padding:8px;">
-                    <button @click="sendCmd(cmd)" @contextmenu="openCmdContextMenu($event, cmd)" v-for="cmd in cmds" :key="cmd.name" :title="cmd.description || cmd.text || ''" style="margin:4px">
+
+                <div v-show="isTabVisible===false" :class="{'use-fixed-theme': !isUseSystemTheme}" style="display:flex;flex-wrap:wrap;padding:8px;flex:1;overflow-y:auto;min-height:0;">
+                    <button @click="sendCmd(cmd)" @contextmenu="openCmdContextMenu($event, cmd)" v-for="cmd in cmds" :key="cmd.name" :title="(cmd.description || cmd.text || '') + ' | Right-click to edit/delete'" style="margin:4px">
                         {{ cmd.name }}
                     </button>
                 </div>
-                <div v-show="isTabVisible" :class="{'use-fixed-theme': !isUseSystemTheme}">
+                <div v-show="isTabVisible" :class="{'use-fixed-theme': !isUseSystemTheme}" style="flex:1;overflow-y:auto;min-height:0;display:flex;flex-direction:column;">
                     <tabs ref="cmdTabs" :options="{ useUrlFragment: false }" >
                         <tab v-bind:name="cmdGroup" v-for="(cmds, cmdGroup) in tabToCmds" :key="cmdGroup">
                             <div style="display:flex;flex-wrap:wrap;padding:8px;">
-                                <button @click="sendCmd(cmd)" @contextmenu="openCmdContextMenu($event, cmd)" v-for="cmd in cmds" :key="cmd.name" :title="cmd.description || cmd.text || ''" style="margin:4px">
+                                <button @click="sendCmd(cmd)" @contextmenu="openCmdContextMenu($event, cmd)" v-for="cmd in cmds" :key="cmd.name" :title="(cmd.description || cmd.text || '') + ' | Right-click to edit/delete'" style="margin:4px">
                                     {{ cmd.name }}
                                 </button>
                             </div>
@@ -52,24 +85,24 @@ export class CmdBtnService {
                 </div>
 
                 <!-- Create Command Dialog -->
-                <div v-if="showDialog" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);display:flex;justify-content:center;align-items:center;z-index:100000;" @click="closeDialog">
-                    <div style="background:white;padding:20px;border-radius:8px;min-width:400px;box-shadow:0 2px 10px rgba(0,0,0,0.1);" @click.stop>
+                <div v-if="showDialog" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);display:flex;justify-content:center;align-items:center;z-index:100000;pointer-events:none;" @click="closeDialog">
+                    <div style="background:white;padding:20px;border-radius:8px;min-width:400px;max-height:90vh;overflow-y:auto;box-shadow:0 2px 10px rgba(0,0,0,0.1);pointer-events:auto;" @click.stop @mousedown.stop @keydown.stop @keyup.stop @keypress.stop>
                         <h3 style="margin-top:0;margin-bottom:16px;">Create New Command</h3>
                         <div style="margin-bottom:12px;">
                             <label style="display:block;margin-bottom:4px;font-weight:bold;font-size:12px;">Command Name</label>
-                            <input v-model="newCmd.name" type="text" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;box-sizing:border-box;" placeholder="e.g., List Files" />
+                            <input v-model="newCmd.name" type="text" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;box-sizing:border-box;" placeholder="e.g., List Files" @click.stop />
                         </div>
                         <div style="margin-bottom:12px;">
                             <label style="display:block;margin-bottom:4px;font-weight:bold;font-size:12px;">Command Text</label>
-                            <textarea v-model="newCmd.text" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;box-sizing:border-box;font-family:monospace;height:80px;" placeholder="e.g., ls -la" />
+                            <textarea v-model="newCmd.text" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;box-sizing:border-box;font-family:monospace;height:80px;" placeholder="e.g., ls -la" @click.stop />
                         </div>
                         <div style="margin-bottom:12px;">
                             <label style="display:block;margin-bottom:4px;font-weight:bold;font-size:12px;">Description</label>
-                            <input v-model="newCmd.description" type="text" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;box-sizing:border-box;" placeholder="What does this command do?" />
+                            <input v-model="newCmd.description" type="text" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;box-sizing:border-box;" placeholder="What does this command do?" @click.stop />
                         </div>
                         <div style="margin-bottom:12px;">
                             <label style="display:block;margin-bottom:4px;font-weight:bold;font-size:12px;">Group/Tab</label>
-                            <input v-model="newCmd.group" type="text" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;box-sizing:border-box;" placeholder="e.g., System" />
+                            <input v-model="newCmd.group" type="text" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;box-sizing:border-box;" placeholder="e.g., System" @click.stop />
                         </div>
                         <div style="margin-bottom:16px;">
                             <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
@@ -85,7 +118,7 @@ export class CmdBtnService {
                 </div>
 
                 <!-- Context Menu -->
-                <div v-if="showContextMenu" :style="{position:'fixed',top:contextMenuY+'px',left:contextMenuX+'px',background:'white',border:'1px solid #ccc',border-radius:'4px',box-shadow:'0 2px 8px rgba(0,0,0,0.15)',z-index:'100001'}" @mouseleave="showContextMenu = false">
+                <div v-if="showContextMenu" :style="{'position':'fixed','top':contextMenuY+'px','left':contextMenuX+'px','background':'white','border':'1px solid #ccc','border-radius':'4px','box-shadow':'0 2px 8px rgba(0,0,0,0.15)','z-index':'100001'}" @mouseleave="showContextMenu = false" @mousedown.stop @click.stop>
                     <div @click="editCommand(contextMenuCmd)" style="padding:8px 16px;cursor:pointer;font-size:12px;user-select:none;" class="context-menu-item">
                         Edit
                     </div>
@@ -93,16 +126,26 @@ export class CmdBtnService {
                         Delete
                     </div>
                 </div>
+
+                <!-- Resize Handle -->
+                <div id="resize-handle" style="position:absolute;bottom:0;right:0;width:20px;height:20px;background:linear-gradient(135deg,transparent 50%,#ccc 50%);cursor:nwse-resize;border-radius:0 0 8px 0;" @mousedown="startResize"></div>
             </div>
         `
-
-        document.querySelector('body').appendChild(div)
         this.div = div
 
         let thisVar = this
 
-        this.app = createApp({
+        console.log('✓ templateHTML defined, length:', templateHTML.length)
+        console.log('✓ First 200 chars:', templateHTML.substring(0, 200))
+        console.log('✓ #app div found:', !!document.getElementById('app'))
+        console.log('✓ About to create Vue app...')
+
+        const appConfig = {
+            template: templateHTML,
             mounted: function(){
+                console.log('✓ Vue app mounted successfully!')
+                console.log('✓ Vue component this:', !!this)
+                console.log('✓ template rendered, tabToCmds:', Object.keys(this.tabToCmds).length)
                 if (this.$refs.cmdTabs && Object.keys(this.tabToCmds).length > 0) {
                     this.$refs.cmdTabs.selectTab("#"+Object.keys(this.tabToCmds)[0])
                 }
@@ -139,6 +182,7 @@ export class CmdBtnService {
                     contextMenuX: 0,
                     contextMenuY: 0,
                     contextMenuCmd: null,
+                    editBeforeSend: false,
                     newCmd: {
                         name: '',
                         text: '',
@@ -156,7 +200,7 @@ export class CmdBtnService {
             // },
             methods: {
                 sendCmd(cmd) {
-                    thisVar.sendCmdToFocusTab(cmd)
+                    thisVar.sendCmdToFocusTab(cmd, this.editBeforeSend)
                 },
                 showCreateCommandDialog() {
                     this.newCmd = {
@@ -267,14 +311,65 @@ export class CmdBtnService {
                         }
                     }
                     return cmds
+                },
+                closePanel() {
+                    thisVar.cleanup()
+                },
+                startResize(e) {
+                    e.preventDefault()
+                    const div = thisVar.div
+                    const startX = e.clientX
+                    const startY = e.clientY
+                    const startWidth = div.offsetWidth
+                    const startHeight = div.offsetHeight
+
+                    const onMouseMove = (event) => {
+                        const newWidth = Math.max(300, startWidth + (event.clientX - startX))
+                        const newHeight = Math.max(100, startHeight + (event.clientY - startY))
+                        div.style.width = newWidth + 'px'
+                        div.style.height = newHeight + 'px'
+                        div.style.maxHeight = newHeight + 'px'
+                    }
+
+                    const onMouseUp = () => {
+                        document.removeEventListener('mousemove', onMouseMove)
+                        document.removeEventListener('mouseup', onMouseUp)
+                    }
+
+                    document.addEventListener('mousemove', onMouseMove)
+                    document.addEventListener('mouseup', onMouseUp)
                 }
             }
-        })
+        }
+        this.app = createApp(appConfig)
         this.app.use(PrimeVue);
         this.app.component('tabs', Tabs)
         .component('tab', Tab)
         .mount('#app');
 
+        console.log('✓ Vue app.mount() called')
+        setTimeout(() => {
+            // Header is created by Vue template, no need to create separately
+
+            const headerEl = document.getElementById('app-parent-header')
+            const finalAppEl = document.getElementById('app')
+            const finalAppParentEl = document.getElementById('app-parent')
+            console.log('✓ After Vue mount:')
+            console.log('#app element:', !!finalAppEl)
+            if (finalAppEl) console.log('#app innerHTML length:', finalAppEl.innerHTML.length)
+            console.log('#app-parent-header element:', !!headerEl)
+            console.log('#app-parent element:', !!finalAppParentEl)
+            if (finalAppParentEl) {
+                const style = window.getComputedStyle(finalAppParentEl)
+                console.log('display:', style.display)
+                console.log('visibility:', style.visibility)
+                console.log('opacity:', style.opacity)
+                console.log('width:', style.width)
+                console.log('height:', style.height)
+            }
+        }, 500)
+
+        // Button click handlers are managed by Vue template via @click directives
 
         // Make the DIV element draggable:
         dragElement(document.getElementById("app-parent"));
@@ -282,45 +377,33 @@ export class CmdBtnService {
         function dragElement(element) {
             let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
             if (document.getElementById(element.id + "header")) {
-                // if present, the header is where you move the DIV from:
                 document.getElementById(element.id + "header").onmousedown = dragMouseDown;
             } else {
-                // otherwise, move the DIV from anywhere inside the DIV:
                 element.onmousedown = dragMouseDown;
             }
 
             function dragMouseDown(e) {
-                // Only allow dragging from empty areas, not buttons/tabs/inputs
-                if(e.target.tagName === "BUTTON" || e.target.tagName === "A" || e.target.id === "cmd-input") {
+                if(e.target.tagName === "BUTTON" || e.target.tagName === "A") {
                     return;
                 }
-                // Check if click is inside a tab or tab-related element
                 if(e.target.closest('.tabs-component-tab') || e.target.closest('.tabs-component-panels')) {
-                    return;
-                }
-                // Don't drag from header
-                if(e.target.closest('#app-parent-header')) {
                     return;
                 }
                 e = e || window.event;
                 e.preventDefault();
-                // get the mouse cursor position at startup:
                 pos3 = e.clientX;
                 pos4 = e.clientY;
                 document.onmouseup = closeDragElement;
-                // call a function whenever the cursor moves:
                 document.onmousemove = elementDrag;
             }
 
             function elementDrag(e) {
                 e = e || window.event;
                 e.preventDefault();
-                // calculate the new cursor position:
                 pos1 = pos3 - e.clientX;
                 pos2 = pos4 - e.clientY;
                 pos3 = e.clientX;
                 pos4 = e.clientY;
-                // clamp position so panel stays within viewport
                 let newTop = element.offsetTop - pos2;
                 let newLeft = element.offsetLeft - pos1;
                 const maxTop = window.innerHeight - 40;
@@ -333,17 +416,17 @@ export class CmdBtnService {
             }
 
             function closeDragElement() {
-                // stop moving when mouse button is released:
                 document.onmouseup = null;
                 document.onmousemove = null;
             }
         }
     }
 
-    sendCmdToFocusTab(cmd) {
+    sendCmdToFocusTab(cmd, editBeforeSend = false) {
         for (let tab of this.tabs) {
             if (tab.hasFocus) {
-                tab.sendInput(cmd.text + (cmd.appendCR ? "\r" : ""))
+                const appendCR = editBeforeSend ? false : cmd.appendCR
+                tab.sendInput(cmd.text + (appendCR ? "\r" : ""))
             }
         }
     }
