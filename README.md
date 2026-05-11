@@ -21,6 +21,3 @@ yarn build
 
 npm publish
 
-## I'm hunting a remote job opportunity
-
-## 我正在找一个可以远程上班的工作
