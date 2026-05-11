@@ -58,21 +58,22 @@ export class CmdBtnService {
                 <div style="display:flex;justify-content:space-between;align-items:center;padding:8px;background:#f5f5f5;border-bottom:1px solid #ddd;flex-shrink:0;">
                     <span style="font-weight:bold;font-size:14px;">Quick Commands</span>
                     <div style="display:flex;gap:4px;align-items:center;">
-                        <label title="When checked, commands are typed into the terminal without pressing Enter, so you can edit them first" style="display:flex;align-items:center;gap:3px;cursor:pointer;font-size:11px;color:#666;white-space:nowrap;">
+                        <label v-show="!minimized" title="When checked, commands are typed into the terminal without pressing Enter, so you can edit them first" style="display:flex;align-items:center;gap:3px;cursor:pointer;font-size:11px;color:#666;white-space:nowrap;">
                             <input type="checkbox" v-model="editBeforeSend" />
                             Edit first
                         </label>
-                        <button @click="showCreateCommandDialog" title="Add a new quick command" style="padding:4px 8px;background:#4CAF50;color:white;border:none;border-radius:3px;cursor:pointer;font-weight:bold;">+ Add Command</button>
+                        <button v-show="!minimized" @click="showCreateCommandDialog" title="Add a new quick command" style="padding:4px 8px;background:#4CAF50;color:white;border:none;border-radius:3px;cursor:pointer;font-weight:bold;">+ Add Command</button>
+                        <button @click="minimized = !minimized" :title="minimized ? 'Expand panel' : 'Minimize panel'" style="padding:4px 8px;background:#f0f0f0;border:1px solid #ccc;border-radius:3px;cursor:pointer;">{{ minimized ? '▢' : '—' }}</button>
                         <button @click="closePanel" style="padding:4px 8px;background:#f0f0f0;border:1px solid #ccc;border-radius:3px;cursor:pointer;">✕</button>
                     </div>
                 </div>
 
-                <div v-show="isTabVisible===false" :class="{'use-fixed-theme': !isUseSystemTheme}" style="display:flex;flex-wrap:wrap;padding:8px;flex:1;overflow-y:auto;min-height:0;">
+                <div v-show="isTabVisible===false && !minimized" :class="{'use-fixed-theme': !isUseSystemTheme}" style="display:flex;flex-wrap:wrap;padding:8px;flex:1;overflow-y:auto;min-height:0;">
                     <button @click="sendCmd(cmd)" @contextmenu="openCmdContextMenu($event, cmd)" v-for="cmd in cmds" :key="cmd.name" :title="(cmd.description || cmd.text || '') + ' | Right-click to edit/delete'" style="margin:4px">
                         {{ cmd.name }}
                     </button>
                 </div>
-                <div v-show="isTabVisible" :class="{'use-fixed-theme': !isUseSystemTheme}" style="flex:1;overflow-y:auto;min-height:0;display:flex;flex-direction:column;">
+                <div v-show="isTabVisible && !minimized" :class="{'use-fixed-theme': !isUseSystemTheme}" style="flex:1;overflow-y:auto;min-height:0;display:flex;flex-direction:column;">
                     <tabs ref="cmdTabs" :options="{ useUrlFragment: false }" >
                         <tab v-bind:name="cmdGroup" v-for="(cmds, cmdGroup) in tabToCmds" :key="cmdGroup">
                             <div style="display:flex;flex-wrap:wrap;padding:8px;">
@@ -128,7 +129,7 @@ export class CmdBtnService {
                 </div>
 
                 <!-- Resize Handle -->
-                <div id="resize-handle" style="position:absolute;bottom:0;right:0;width:20px;height:20px;background:linear-gradient(135deg,transparent 50%,#ccc 50%);cursor:nwse-resize;border-radius:0 0 8px 0;" @mousedown="startResize"></div>
+                <div v-show="!minimized" id="resize-handle" style="position:absolute;bottom:0;right:0;width:20px;height:20px;background:linear-gradient(135deg,transparent 50%,#ccc 50%);cursor:nwse-resize;border-radius:0 0 8px 0;" @mousedown="startResize"></div>
             </div>
         `
         this.div = div
@@ -183,6 +184,7 @@ export class CmdBtnService {
                     contextMenuY: 0,
                     contextMenuCmd: null,
                     editBeforeSend: false,
+                    minimized: false,
                     newCmd: {
                         name: '',
                         text: '',
