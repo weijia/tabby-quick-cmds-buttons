@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Quick Cmd Buttons - Layout Test</title>
+<style>
+  body {
+    background: #333;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    margin: 0;
+    padding: 20px;
+    color: #ccc;
+    --theme-fg-more-2: #bbb;
+    --theme-fg: #fff;
+    --bs-body-bg: #2d2d2d;
+  }
+
+  /* Simulating the #app-parent container */
+  #app-parent {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 99999;
+    max-height: 70vh;
+    min-width: 600px;
+    overflow: auto;
+    cursor: move;
+    border: 1px solid #555;
+    border-radius: 4px;
+    background: #2d2d2d;
+  }
+
+  /* ── tabs-component.css (our modified version) ── */
+  .tabs-component {
+    margin: 0;
+  }
+
+  .tabs-component-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: flex-start;
+    border: 0;
+    border-radius: 6px;
+    margin-bottom: -1px;
+    max-height: 30vh;
+    overflow-y: auto;
+    padding: 0;
+  }
+
+  .tabs-component-tab {
+    color: var(--theme-fg-more-2);
+    font-size: 14px;
+    font-weight: 600;
+    margin-right: 0;
+    list-style: none;
+    background-color: var(--bs-body-bg);
+    border: solid 1px #555;
+    border-radius: 3px 3px 0 0;
+    margin-right: .5em;
+    transform: translateY(2px);
+    cursor: pointer;
+  }
+
+  .tabs-component-tab:not(:last-child) {
+    border-bottom: none;
+  }
+
+  .tabs-component-tab:hover {
+    color: #aaa;
+  }
+
+  .tabs-component-tab.is-active {
+    color: #fff;
+    border-bottom: solid 1px var(--bs-body-bg);
+    z-index: 2;
+    transform: translateY(0);
+  }
+
+  .tabs-component-tab-a {
+    align-items: center;
+    color: var(--theme-fg-more-2);
+    display: flex;
+    padding: .35em .6em;
+    font-size: 12px;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .tabs-component-panels {
+    background-color: var(--bs-body-bg);
+    border: solid 1px #555;
+    border-radius: 0 6px 6px 6px;
+    box-shadow: 0 0 10px rgba(0,0,0,.05);
+    padding: 1em 1em;
+  }
+
+  .tab-panel {
+    display: none;
+  }
+  .tab-panel.is-active {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  /* Command buttons */
+  .cmd-btn {
+    margin: 4px;
+    padding: 4px 8px;
+    cursor: pointer;
+    background: #e1ecf4;
+    border-radius: 3px;
+    border: 1px solid #7aa7c7;
+    color: #39739d;
+    font-size: 13px;
+  }
+  .cmd-btn:hover {
+    background-color: #b3d3ea;
+    color: #2c5777;
+  }
+
+  h3 { color: #fff; margin: 0 0 10px; }
+  .info { color: #888; font-size: 12px; margin-bottom: 20px; }
+</style>
+</head>
+<body>
+
+<div id="app-parent">
+  <div class="tabs-component">
+    <ul class="tabs-component-tabs" id="tab-headers"></ul>
+    <div class="tabs-component-panels" id="tab-panels"></div>
+  </div>
+</div>
+
+<script>
+// Simulated command groups matching real data
+const groups = {
+  'Sessions': ['list sessions', 'attach', 'create session', 'kill session', 'workspace restore', 'workspace list'],
+  'Monitor': ['dashboard', 'dash (compact)', 'status', 'activity', 'changes', 'conflicts', 'errors', 'logs', 'watch status', 'view panes', 'copy output', 'save outputs'],
+  'Dispatch': ['send broadcast', 'send claude', 'send codex', 'send gemini', 'smart route', 'distribute beads', 'interrupt all', 'palette'],
+  'Agents': ['add claude', 'add codex', 'add gemini', 'add interactive', 'spawn', 'respawn', 'health', 'cc', 'cod', 'gmi'],
+  'SIFS \u2014 Flywheel Setup': ['doctor', 'doctor --fix', 'status', 'versions', 'update dry-run', 'update', 'cheatsheet', 'dashboard'],
+  'Beads \u2014 Issue Tracking': ['list open', 'ready', 'create', 'quick capture', 'show', 'status', 'sync', 'viewer TUI', 'robot triage', 'robot next', 'robot plan', 'robot insights', 'robot alerts'],
+  'CASS \u2014 Session Search': ['search', 'TUI', 'index', 'index full', 'status', 'health'],
+  'CM \u2014 Agent Memory': ['context', 'doctor', 'quickstart', 'onboard status', 'playbook add'],
+  'UBS \u2014 Bug Scanner': ['scan dir', 'scan staged', 'scan diff', 'doctor', 'HTML report'],
+  'RU \u2014 Repo Updater': ['sync all', 'status', 'review', 'list repos', 'doctor'],
+  'Safety \u2014 DCG/PT/SLB': ['explain', 'test cmd', 'list packs', 'dcg doctor', 'pt triage', 'pt scan', 'pt deep', 'pt history', 'slb pending', 'slb tui', 'slb daemon'],
+  'CAAM \u2014 Account Manager': ['status', 'list profiles', 'pick', 'auto-rotate', 'cooldown list'],
+  'JFP \u2014 Prompt Library': ['picker', 'suggest', 'list all', 'search'],
+  'APR \u2014 Plan Reviser': ['list workflows', 'setup', 'stats', 'status'],
+  'MS \u2014 Meta Skill': ['search', 'list', 'suggest', 'index', 'graph insights'],
+  'FT \u2014 WezTerm Automata': ['status', 'watch', 'stop', 'search', 'doctor'],
+  'SRPS \u2014 Resource Protection': ['monitor TUI', 'srps doctor', 'check-throttled'],
+  'RCH \u2014 Remote Compilation': ['status', 'workers', 'dashboard', 'doctor'],
+  'System': ['top', 'disk ~', 'disk /data', 'tmux reload', 'cleanup', 'upgrade', 'deps', 'quick setup'],
+  'Mail': ['start server'],
+};
+
+const headerContainer = document.getElementById('tab-headers');
+const panelContainer = document.getElementById('tab-panels');
+let activeGroup = Object.keys(groups)[0];
+
+function render() {
+  headerContainer.innerHTML = '';
+  panelContainer.innerHTML = '';
+
+  for (const [group, cmds] of Object.entries(groups)) {
+    // Tab header
+    const li = document.createElement('li');
+    li.className = 'tabs-component-tab' + (group === activeGroup ? ' is-active' : '');
+    const a = document.createElement('a');
+    a.className = 'tabs-component-tab-a';
+    a.textContent = group;
+    a.onclick = (e) => { e.preventDefault(); activeGroup = group; render(); };
+    li.appendChild(a);
+    headerContainer.appendChild(li);
+
+    // Tab panel
+    const panel = document.createElement('div');
+    panel.className = 'tab-panel' + (group === activeGroup ? ' is-active' : '');
+    for (const cmd of cmds) {
+      const btn = document.createElement('button');
+      btn.className = 'cmd-btn';
+      btn.textContent = cmd;
+      btn.title = 'Description for: ' + cmd;
+      panel.appendChild(btn);
+    }
+    panelContainer.appendChild(panel);
+  }
+}
+
+render();
+
+// Make draggable (same as plugin)
+const el = document.getElementById('app-parent');
+let pos1=0, pos2=0, pos3=0, pos4=0;
+el.onmousedown = function(e) {
+  if (e.target.tagName === 'BUTTON' || e.target.tagName === 'A') return;
+  e.preventDefault();
+  pos3 = e.clientX; pos4 = e.clientY;
+  document.onmouseup = () => { document.onmouseup = null; document.onmousemove = null; };
+  document.onmousemove = function(e) {
+    e.preventDefault();
+    pos1 = pos3 - e.clientX; pos2 = pos4 - e.clientY;
+    pos3 = e.clientX; pos4 = e.clientY;
+    el.style.top = (el.offsetTop - pos2) + 'px';
+    el.style.left = (el.offsetLeft - pos1) + 'px';
+  };
+};
+</script>
+</body>
+</html>
