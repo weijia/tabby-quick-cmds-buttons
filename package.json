@@ -1,6 +1,6 @@
 {
   "name": "tabby-quick-cmds-buttons",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "An plugin that create buttons for quick commands, need to install quick-cmds and add commands first, based on Eugene Pankov's tabby-clippy",
   "keywords": [
     "tabby-plugin"
@@ -24,13 +24,14 @@
     "@angular/forms": "^15.2.6",
     "@angular/platform-browser": "^15.2.6",
     "@ng-bootstrap/ng-bootstrap": "^14.1.0",
+    "@playwright/test": "^1.59.1",
     "@types/webpack-env": "^1.16.0",
     "apply-loader": "^2.0.0",
     "css-loader": "^6.11.0",
-    "sass": "^1.97.3",
     "pug": "^3.0.3",
     "pug-loader": "^2.4.0",
     "rxjs": "^7.3.0",
+    "sass": "^1.97.3",
     "sass-loader": "^11.0.1",
     "style-loader": "^2.0.0",
     "tabby-core": "^1.0.156",
