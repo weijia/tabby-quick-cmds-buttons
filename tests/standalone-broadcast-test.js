@@ -70,8 +70,8 @@ const path = require('path');
                 data() {
                     return {
                         cmds: [
-                            { name: 'NormalCmd', text: 'uptime', broadcast: false },
-                            { name: 'ClusterUpdate', text: 'sudo apt update', broadcast: true }
+                            { name: 'NormalCmd', text: 'date', broadcast: false },
+                            { name: 'CheckClusterUptime', text: 'uptime', broadcast: true }
                         ],
                         broadcastAll: false,
                         confirmBroadcasts: true,
@@ -121,7 +121,7 @@ const path = require('path');
 
     // Test 2: Verify button styling & emoji
     const normalBtn = await page.locator('#btn-NormalCmd');
-    const broadcastBtn = await page.locator('#btn-ClusterUpdate');
+    const broadcastBtn = await page.locator('#btn-CheckClusterUptime');
     const broadcastBtnText = await broadcastBtn.textContent();
     console.log('\n✓ Test 2: Button Rendering:');
     console.log('  - Normal button label:', (await normalBtn.textContent()).trim());
@@ -135,13 +135,13 @@ const path = require('path');
     console.log('  - Broadcast checkbox present in dialog:', (await dialogCheckbox.count() > 0));
 
     // Fill form and save a new broadcast command
-    await page.locator('#input-cmd-name').fill('RebootCluster');
-    await page.locator('#input-cmd-text').fill('sudo reboot');
+    await page.locator('#input-cmd-name').fill('BroadcastHealthCheck');
+    await page.locator('#input-cmd-text').fill('echo "broadcast health ok"');
     await dialogCheckbox.check();
     await page.locator('#btn-save').click();
     await page.waitForTimeout(300);
 
-    const newBroadcastBtn = await page.locator('#btn-RebootCluster');
+    const newBroadcastBtn = await page.locator('#btn-BroadcastHealthCheck');
     console.log('  - New broadcast command saved & rendered with icon:', (await newBroadcastBtn.textContent()).includes('📡'));
 
     // Test 4: Verify Safety Confirmation Modal handling
@@ -161,7 +161,7 @@ const path = require('path');
     const dispatched = await page.evaluate(() => window.vueInstance.dispatchedInputs);
     console.log('\n✓ Test 5: Command Dispatch:');
     console.log('  - Dispatched commands:', dispatched);
-    console.log('  - Confirmed broadcast successfully dispatched:', dispatched.includes('sudo reboot'));
+    console.log('  - Confirmed broadcast successfully dispatched:', dispatched.includes('echo "broadcast health ok"'));
 
     await page.screenshot({ path: path.join(__dirname, 'broadcast-test-verified.png') });
     console.log('\n📸 Test screenshot saved to broadcast-test-verified.png');
