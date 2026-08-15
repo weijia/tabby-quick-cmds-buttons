@@ -58,6 +58,14 @@ export class CmdBtnService {
                 <div style="display:flex;justify-content:space-between;align-items:center;padding:8px;background:#f5f5f5;border-bottom:1px solid #ddd;flex-shrink:0;">
                     <span style="font-weight:bold;font-size:14px;">Quick Commands</span>
                     <div style="display:flex;gap:4px;align-items:center;">
+                        <label v-show="!minimized" title="When checked, clicking ANY button will broadcast it to ALL open terminal tabs simultaneously!" style="display:flex;align-items:center;gap:3px;cursor:pointer;font-size:11px;color:#d32f2f;font-weight:bold;white-space:nowrap;">
+                            <input type="checkbox" v-model="broadcastAll" />
+                            Broadcast All
+                        </label>
+                        <label v-show="!minimized" title="Require confirmation before sending a broadcast command" style="display:flex;align-items:center;gap:3px;cursor:pointer;font-size:11px;color:#d32f2f;white-space:nowrap;">
+                            <input type="checkbox" v-model="confirmBroadcasts" />
+                            Confirm Broadcasts
+                        </label>
                         <label v-show="!minimized" title="When checked, commands are typed into the terminal without pressing Enter, so you can edit them first" style="display:flex;align-items:center;gap:3px;cursor:pointer;font-size:11px;color:#666;white-space:nowrap;">
                             <input type="checkbox" v-model="editBeforeSend" />
                             Edit first
@@ -69,16 +77,16 @@ export class CmdBtnService {
                 </div>
 
                 <div v-show="isTabVisible===false && !minimized" :class="{'use-fixed-theme': !isUseSystemTheme}" style="display:flex;flex-wrap:wrap;padding:8px;flex:1;overflow-y:auto;min-height:0;">
-                    <button @click="sendCmd(cmd)" @contextmenu="openCmdContextMenu($event, cmd)" v-for="cmd in cmds" :key="cmd.name" :title="(cmd.description || cmd.text || '') + ' | Right-click to edit/delete'" style="margin:4px">
-                        {{ cmd.name }}
+                    <button @click="sendCmd(cmd)" @contextmenu="openCmdContextMenu($event, cmd)" v-for="cmd in cmds" :key="cmd.name" :title="(cmd.description || cmd.text || '') + (cmd.broadcast ? ' (BROADCAST COMMAND)' : '') + ' | Right-click to edit/delete'" :style="cmd.broadcast ? 'margin:4px;background:#ffebee;border:1px solid #d32f2f;color:#b71c1c;font-weight:bold;' : 'margin:4px'">
+                        {{ cmd.broadcast ? '📡 ' + cmd.name : cmd.name }}
                     </button>
                 </div>
                 <div v-show="isTabVisible && !minimized" :class="{'use-fixed-theme': !isUseSystemTheme}" style="flex:1;overflow-y:auto;min-height:0;display:flex;flex-direction:column;">
                     <tabs ref="cmdTabs" :options="{ useUrlFragment: false }" >
                         <tab v-bind:name="cmdGroup" v-for="(cmds, cmdGroup) in tabToCmds" :key="cmdGroup">
                             <div style="display:flex;flex-wrap:wrap;padding:8px;">
-                                <button @click="sendCmd(cmd)" @contextmenu="openCmdContextMenu($event, cmd)" v-for="cmd in cmds" :key="cmd.name" :title="(cmd.description || cmd.text || '') + ' | Right-click to edit/delete'" style="margin:4px">
-                                    {{ cmd.name }}
+                                <button @click="sendCmd(cmd)" @contextmenu="openCmdContextMenu($event, cmd)" v-for="cmd in cmds" :key="cmd.name" :title="(cmd.description || cmd.text || '') + (cmd.broadcast ? ' (BROADCAST COMMAND)' : '') + ' | Right-click to edit/delete'" :style="cmd.broadcast ? 'margin:4px;background:#ffebee;border:1px solid #d32f2f;color:#b71c1c;font-weight:bold;' : 'margin:4px'">
+                                    {{ cmd.broadcast ? '📡 ' + cmd.name : cmd.name }}
                                 </button>
                             </div>
                         </tab>
@@ -106,9 +114,13 @@ export class CmdBtnService {
                             <input v-model="newCmd.group" type="text" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;box-sizing:border-box;" placeholder="e.g., System" @click.stop />
                         </div>
                         <div style="margin-bottom:16px;">
-                            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:8px;">
                                 <input v-model="newCmd.appendCR" type="checkbox" />
                                 <span style="font-size:12px;">Append newline (Enter)</span>
+                            </label>
+                            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;color:#d32f2f;font-weight:bold;">
+                                <input v-model="newCmd.broadcast" type="checkbox" />
+                                <span style="font-size:12px;">📡 Broadcast to ALL open tabs simultaneously</span>
                             </label>
                         </div>
                         <div style="display:flex;gap:8px;justify-content:flex-end;">
@@ -183,6 +195,8 @@ export class CmdBtnService {
                     contextMenuX: 0,
                     contextMenuY: 0,
                     contextMenuCmd: null,
+                    broadcastAll: false,
+                    confirmBroadcasts: true,
                     editBeforeSend: false,
                     minimized: false,
                     newCmd: {
@@ -191,6 +205,7 @@ export class CmdBtnService {
                         description: '',
                         group: 'default',
                         appendCR: true,
+                        broadcast: false,
                     },
                 }
             },
@@ -202,7 +217,14 @@ export class CmdBtnService {
             // },
             methods: {
                 sendCmd(cmd) {
-                    thisVar.sendCmdToFocusTab(cmd, this.editBeforeSend)
+                    if (cmd.broadcast || this.broadcastAll) {
+                        if (this.confirmBroadcasts) {
+                            if (!confirm(`⚠️ DANGER: You are about to broadcast a command to ALL open tabs.\n\nAre you sure you want to proceed?`)) {
+                                return;
+                            }
+                        }
+                    }
+                    thisVar.sendCmdToFocusTab(cmd, this.editBeforeSend, this.broadcastAll)
                 },
                 showCreateCommandDialog() {
                     this.newCmd = {
@@ -211,6 +233,7 @@ export class CmdBtnService {
                         description: '',
                         group: 'default',
                         appendCR: true,
+                        broadcast: false,
                     }
                     this.showDialog = true
                     this.showContextMenu = false
@@ -237,6 +260,7 @@ export class CmdBtnService {
                             description: this.newCmd.description || '',
                             group: this.newCmd.group || 'default',
                             appendCR: this.newCmd.appendCR,
+                            broadcast: !!this.newCmd.broadcast,
                         }
                     } else {
                         // Add new
@@ -246,6 +270,7 @@ export class CmdBtnService {
                             description: this.newCmd.description || '',
                             group: this.newCmd.group || 'default',
                             appendCR: this.newCmd.appendCR,
+                            broadcast: !!this.newCmd.broadcast,
                         })
                     }
                     // Persist changes - this will trigger config.changed$ subscription
@@ -424,9 +449,9 @@ export class CmdBtnService {
         }
     }
 
-    sendCmdToFocusTab(cmd, editBeforeSend = false) {
+    sendCmdToFocusTab(cmd, editBeforeSend = false, broadcastAll = false) {
         for (let tab of this.tabs) {
-            if (tab.hasFocus) {
+            if (tab.hasFocus || cmd.broadcast || broadcastAll) {
                 const appendCR = editBeforeSend ? false : cmd.appendCR
                 tab.sendInput(cmd.text + (appendCR ? "\r" : ""))
             }
